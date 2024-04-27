@@ -1,21 +1,27 @@
-import React, { useState } from 'react';
-import DraggableScreen from './components/DraggableScreen';
-import styled, { createGlobalStyle } from 'styled-components';
+import Movies from './components/Movies.jsx';
+import {Route, Routes, createBrowserRouter, RouterProvider} from 'react-router-dom';
 
-const GlobalStyle = createGlobalStyle`
-  * {
-    margin: 0;
-    box-sizing: border-box;
-  }
-`;
-
-function App() {
-  return (
-      <>
-        <GlobalStyle/>
-        <DraggableScreen />
-      </>
-  );
+function root() {
+    return (
+        <>
+            <Routes>
+                <Route path='/*' element={<Movies title="nemo"/>} />
+            </Routes>
+        </>
+    )
 }
 
-export default App;
+const router = createBrowserRouter(
+    [{path:"*", Component: root}]
+);
+
+function App() {
+
+  return (
+    <>
+        <RouterProvider router={router}/>
+    </>
+  )
+}
+
+export default App
