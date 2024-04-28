@@ -1,6 +1,7 @@
-import Draggable, {DraggableCore} from 'react-draggable';
+import Draggable from 'react-draggable';
 import styled from "styled-components"
-import {useState, useRef } from "react";
+import {useState, useRef, useEffect } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 const Button = styled.button`
   display: flex;
@@ -20,35 +21,33 @@ const Button = styled.button`
 `;
 
 export const GameScreen = styled.div`
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: row;
-    
-   @media screen and (max-width: 900px) {
-     flex-direction: column;
-   }
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: row;
+
+  @media screen and (max-width: 900px) {
+    flex-direction: column;
+  }
 `;
 
 export const MainScreen = styled.div`
-    height: 100%;
-    width: 75%;
-    
-   @media screen and (max-width: 900px) {
+  height: 100%;
+  width: 75%;
+
+  @media screen and (max-width: 900px) {
     height: 75%;
     width: 100%;
   }
 `;
 
 export const SideBar = styled.div`
-    height: 100%;
-    width: 25%;
-    border-left: 1px solid #9f9f9f;
-    overflow-y: auto;
-
+  height: 100%;
+  width: 25%;
+  border-left: 1px solid #9f9f9f;
+  overflow-y: auto;
   margin: 0;
   padding: 0;
-
   @media screen and (max-width: 900px) {
     height: 25%;
     width: 100%;
@@ -58,18 +57,16 @@ export const SideBar = styled.div`
 `;
 
 export const CraftedButtons = styled.div`
-    height: wrap-content;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    border-left: 1px solid #9f9f9f;
-
+  height: wrap-content;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  border-left: 1px solid #9f9f9f;
   * {
     margin-right: 10px;
     margin-bottom: 10px;
   }
-
   @media screen and (max-width: 900px) {
     height: 100%;
     width: wrap-content;
@@ -93,31 +90,71 @@ const handleClick = (e) => {
 
 export default function DraggableScreen() {
     const [buttons, setButtons] = useState([]);
-    const buttonRefs = useRef([]);
+    const buttonRefs = useRef({});
 
-    const addDraggableButton = () => {
+    const addDraggableButton = (event) => {
+        const { clientX, clientY } = event;
+        const key = uuidv4();
+
         const newButton = (
-            <Draggable
-                key={buttons.length}
-                onStop={(e, data) => handleStop(e, data, buttons.length)}
+            <div
+                key={key}
+                style={{
+                    position: 'absolute',
+                    left: clientX,
+                    top: clientY,
+                    zIndex: 1000,
+                }}
             >
-                <Button
-                    ref={el => (buttonRefs.current[buttons.length] = el)}
+                <Draggable
+                    onStop={(e, data) => handleStop(e, data, key)}
                 >
-                    Move Me
-                </Button>
-            </Draggable>
+                    <Button ref={ref => buttonRefs.current[key] = ref}>
+                        Move Me
+                    </Button>
+                </Draggable>
+            </div>
         );
+
         setButtons([...buttons, newButton]);
     };
 
-    const handleStop = (e, data, index) => {
-        const currentButton = buttonRefs.current[index];
+    const addNewButton = (left, top, key) => {
+        const newButton = (
+            <div
+                key={key}
+                style={{
+                    position: 'absolute',
+                    left: left + 50,
+                    top: top + 50,
+                    zIndex: 1000,
+                }}
+            >
+                <Draggable
+                    onStop={(e, data) => handleStop(e, data, key)}
+                >
+                    <Button ref={ref => buttonRefs.current[key] = ref}>
+                        Move Me
+                    </Button>
+                </Draggable>
+            </div>
+        );
+
+        setButtons(prevButtons => [...prevButtons, newButton]);
+    };
+
+    const handleStop = (e, data, key) => {
+        const currentButton = buttonRefs.current[key];
         const currentButtonRect = currentButton.getBoundingClientRect();
 
-        buttonRefs.current.forEach((button, idx) => {
-            if (idx !== index) {
-                const rect = button.getBoundingClientRect();
+        let deleted = false;
+
+        console.log("stopped at "+ key)
+
+        Object.keys(buttonRefs.current).forEach(k => {
+            if (k !== key && !deleted) {
+                console.log("comparing against "+ k)
+                const rect = buttonRefs.current[k].getBoundingClientRect();
 
                 if (
                     currentButtonRect.left < rect.right &&
@@ -125,11 +162,27 @@ export default function DraggableScreen() {
                     currentButtonRect.top < rect.bottom &&
                     currentButtonRect.bottom > rect.top
                 ) {
-                    console.log(`Buttons at index ${index} and ${idx} are overlapping.`);
+                    setButtons(prevButtons => prevButtons.filter(button => button.key !== k && button.key !== key));
+                    const newButtonKey = uuidv4();
+                    const { left, top } = currentButtonRect;
+                    addNewButton(left, top, newButtonKey);
+
+                    deleted = true;
                 }
             }
         });
     };
+
+    useEffect(() => {
+        const newButtonRefs = {};
+        buttons.forEach(button => {
+            const key = button.key;
+            if (buttonRefs.current[key]) {
+                newButtonRefs[key] = buttonRefs.current[key];
+            }
+        });
+        buttonRefs.current = newButtonRefs;
+    }, [buttons]);
 
     return (
         <GameScreen>
