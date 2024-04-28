@@ -21,12 +21,12 @@ const StyledCard = styled.div`
 `;
 
 const StyledTitle = styled.h1`
-    margin-bottom: 10px;
+    margin-bottom: 25px;
     color: darkblue;
 `;
 
 const StyledP = styled.p`
-    margin-bottom: 5px;
+    margin-bottom: 18px;
 `;
 
 const StyledLabel = styled.span`
@@ -42,7 +42,7 @@ const StyledImage = styled.img`
 `;
 
 const StyledPlot = styled.p`
-    margin: 20px 10px;
+    margin: 10px;
     text-align: left;
 `;
 
