@@ -1,39 +1,9 @@
 import Draggable from 'react-draggable';
 import styled from "styled-components"
 import {useState, useRef, useEffect } from "react";
+import {NavLink} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import MovieButton from "../MovieButton.jsx";
-
-const StyledHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin: 20px;
-  font-size: 15px;
-`;
-const StyledTitle = styled.h1`
-  text-align: right;
-`;
-
-const GameScreen = styled.div`
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  flex-direction: row;
-
-  @media screen and (max-width: 900px) {
-    flex-direction: column;
-  }
-`;
-
-const MainScreen = styled.div`
-  height: 100%;
-  width: 75%;
-
-  @media screen and (max-width: 900px) {
-    height: 75%;
-    width: 100%;
-  }
-`;
+import MovieButton from "./MovieButton.jsx";
 
 const SideBar = styled.div`
   height: 100%;
@@ -57,12 +27,14 @@ const CraftedButtons = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   border-left: 1px solid #9f9f9f;
+  
   * {
     margin-right: 10px;
     margin-bottom: 10px;
   }
   @media screen and (max-width: 900px) {
     height: 100%;
+    flex-direction: column;
     width: wrap-content;
     border-top: 1px solid #9f9f9f;
   }
@@ -70,9 +42,32 @@ const CraftedButtons = styled.div`
 
 const Instructions = styled.h2`
   height: 100px;
-  weight: 200px;
+  width: 200px;
   border: 1px solid #9f9f9f;
 `
+
+const StyledNavLink = styled.a`
+  transition: all 0.5s;
+  cursor: pointer;
+  position: relative;
+
+  &:after {
+    content: '»';
+    position: absolute;
+    opacity: 0;
+    right: -25px;
+    transition: 0.5s;
+  }
+
+  &:hover {
+    padding-right: 25px;
+
+    &:after {
+      opacity: 1;
+      right: 10px;
+    }
+  }
+`;
 
 const handleClick = (e) => {
     if (e.type === 'click') {
@@ -87,9 +82,7 @@ export default function DraggableScreen() {
     const [buttons, setButtons] = useState([]);
     const buttonRefs = useRef({});
 
-    const addDraggableButton = (event) => {
-        console.log("FCUUUCUGO:SBNKLBNGKBJSKHCXBJHDK")
-        const { clientX, clientY } = event;
+    const addDraggableButton = ({ clientX, clientY }) => {
         // Generate unique key for each button
         const key = uuidv4();
 
@@ -100,30 +93,7 @@ export default function DraggableScreen() {
                     position: 'absolute',
                     left: clientX,
                     top: clientY,
-                    zIndex: 1000,
-                }}
-            >
-                <Draggable
-                    onStop={(e, data) => handleStop(e, data, key)}
-                >
-                    <div ref={ref => buttonRefs.current[key] = ref}>
-                        <MovieButton/>
-                    </div>
-                </Draggable>
-            </div>
-        );
-
-        setButtons([...buttons, newButton]);
-    };
-
-    const addNewButton = (left, top, key) => {
-        const newButton = (
-            <div
-                key={key}
-                style={{
-                    position: 'absolute',
-                    left: left + 50,
-                    top: top + 50,
+                    transform: 'translate(-50%, -50%)',
                     zIndex: 1000,
                 }}
             >
@@ -141,7 +111,7 @@ export default function DraggableScreen() {
     };
 
     const handleStop = (e, data, key) => {
-        //The user has picked up the mouse and we have to check if any buttons are overlapping
+        //User has picked up the mouse and we have to check if any buttons are overlapping
         const currentButton = buttonRefs.current[key];
         const currentButtonRect = currentButton.getBoundingClientRect();
 
@@ -150,7 +120,6 @@ export default function DraggableScreen() {
 
         Object.keys(buttonRefs.current).forEach(k => {
             if (k !== key && !deleted) {
-                console.log("comparing against "+ k)
                 const rect = buttonRefs.current[k].getBoundingClientRect();
 
                 if (
@@ -161,10 +130,7 @@ export default function DraggableScreen() {
                 ) {
                     //Overlap found. Delete the buttons and add a new one.
                     setButtons(prevButtons => prevButtons.filter(button => button.key !== k && button.key !== key));
-                    const newButtonKey = uuidv4();
-                    const { left, top } = currentButtonRect;
-                    addNewButton(left, top, newButtonKey);
-
+                    addDraggableButton(e);
                     deleted = true;
                 }
             }
@@ -185,24 +151,15 @@ export default function DraggableScreen() {
     }, [buttons]);
 
     return (
-        <GameScreen>
-            <MainScreen>
-            <StyledHeader>
-                <StyledTitle>Lagtrain</StyledTitle>
-                <StyledTitle>Movie<br/>Craft</StyledTitle>
-            </StyledHeader>
-            </MainScreen>
-            <SideBar>
-                <CraftedButtons>
-                    {[...Array(5)].map((_, index) => (
-                        <div key={index} onClick={addDraggableButton}>
-                            <MovieButton/>
-                        </div>
-                    ))}
-                    <Instructions>Drag elements to craft</Instructions>
-                </CraftedButtons>
-            </SideBar>
+        <SideBar>
+            <CraftedButtons>
+                {[...Array(5)].map((_, index) => (
+                    <div key={index} onMouseDown={e => addDraggableButton(e)}>
+                        <MovieButton/>
+                    </div>
+                ))}
+            </CraftedButtons>
             {buttons.map(button => button)}
-        </GameScreen>
+        </SideBar>
     );
 }

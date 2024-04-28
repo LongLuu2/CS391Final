@@ -7,6 +7,8 @@ const Button = styled.button`
     background: linear-gradient(to bottom, #ffffff, #f0f0f0);
     border: 2px solid grey;
     padding: 10px;
+    height: 100px;
+    width: 175px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -20,11 +22,13 @@ const ButtonImg = styled.img`
     width: 30px;
     height: auto;
     padding-top: 8px;
+    pointer-events: none;
 `
 
 const ButtonText = styled.p`
     flex: 1;    
     overflow: hidden;
+    pointer-events: none;
 `
 const Column = styled.div`
     flex: 50%;

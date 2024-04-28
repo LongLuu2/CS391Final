@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import DraggableScreen from './components/DraggableScreen';
 import styled, { createGlobalStyle } from 'styled-components';
+import GameScreen from "./pages/GameScreen.jsx";
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -13,7 +13,7 @@ function App() {
   return (
       <>
         <GlobalStyle/>
-        <DraggableScreen />
+        <GameScreen />
       </>
   );
 }
