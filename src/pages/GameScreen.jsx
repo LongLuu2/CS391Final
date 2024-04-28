@@ -1,5 +1,6 @@
 import styled from "styled-components"
 import DraggableScreen from "../components/DraggableScreen.jsx";
+import Header from "../components/Header.jsx";
 
 const StyledHeader = styled.div`
   display: flex;
@@ -37,10 +38,7 @@ export default function GameScreen() {
     return (
         <Screen>
             <MainScreen>
-                <StyledHeader>
-                    <StyledTitle>Lagtrain</StyledTitle>
-                    <StyledTitle>Movie<br/>Craft</StyledTitle>
-                </StyledHeader>
+                <Header/>
             </MainScreen>
             <DraggableScreen/>
         </Screen>

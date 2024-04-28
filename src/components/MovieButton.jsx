@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BubbleNav from './BubbleNav';
+
 const Button = styled.button`
     display: flex;
-    align-items: center;
     background: linear-gradient(to bottom, #ffffff, #f0f0f0);
     border: 2px solid grey;
-    padding: 10px;
-    height: 100px;
-    width: 175px;
+    align-items: center;
+    height: 70px;
+    width: 150px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -21,8 +21,8 @@ const Button = styled.button`
 const ButtonImg = styled.img` 
     width: 30px;
     height: auto;
-    padding-top: 8px;
     pointer-events: none;
+    margin-right: 10px;
 `
 
 const ButtonText = styled.p`
@@ -31,10 +31,10 @@ const ButtonText = styled.p`
     pointer-events: none;
 `
 const Column = styled.div`
-    flex: 50%;
 `
 const Row = styled.div`
     display: flex;
+    flex-direction: row;
 `
 
 const MovieButton = () => {
@@ -85,12 +85,8 @@ const MovieButton = () => {
         <Button onClick={handleButtonClick} onDoubleClick={handleDoubleClick}>
             {movieData ? (
                     <Row>
-                        <Column>
-                            <ButtonImg src={movieData.Poster} alt="Poster"/>
-                        </Column>
-                        <Column>
-                            <ButtonText>{limitText(movieData.Title, 40)}</ButtonText>
-                        </Column>
+                        <ButtonImg src={movieData.Poster} alt="Poster"/>
+                        <ButtonText>{limitText(movieData.Title, 40)}</ButtonText>
                     </Row>
             ) : (
                 <div>Loading...</div>

@@ -15,7 +15,6 @@ function Root() {
   return(
     <>
     <GlobalStyle/>
-    <Header/>
     <Routes>
       /*adds routes */
       <Route path ='/' element = {<GameScreen/>}/>

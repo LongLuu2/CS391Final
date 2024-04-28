@@ -27,11 +27,12 @@ const CraftedButtons = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   border-left: 1px solid #9f9f9f;
-  
-  * {
+
+  div {
     margin-right: 10px;
     margin-bottom: 10px;
   }
+  
   @media screen and (max-width: 900px) {
     height: 100%;
     flex-direction: column;
