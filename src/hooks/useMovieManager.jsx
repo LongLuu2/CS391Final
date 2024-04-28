@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 const useMovieManager = () => {
   const [movies, setMovies] = useState([]);
 
-  // Load movies from local storage when component mounts
   useEffect(() => {
     const storedMovies = JSON.parse(localStorage.getItem('movies'));
     if (storedMovies) {

@@ -47,7 +47,6 @@ const MovieButton = () => {
     const toggle = () => {
         setIsVisible(!isVisible);
     };
-    const [lastClickTime, setLastClickTime] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -63,15 +62,14 @@ const MovieButton = () => {
         fetchData();
     }, []);
 
-    const handleButtonClick = () => {
+    const handleButtonClick = (e) => {
+        console.log("Button clicked!");
+        const audio = new Audio('/on-click.mp3');
+        audio.play();
+    };
 
-        //toggle when double clicked
-        const now = Date.now();
-        if (now - lastClickTime < 300) {
-            toggle();
-            console.log("Double clicked!");
-        }
-        setLastClickTime(now);
+    const handleDoubleClick = () => {
+        toggle();
     };
 
     const limitText = (text, maxLength) => {
@@ -84,7 +82,7 @@ const MovieButton = () => {
 ///
     return (
         <>
-        <Button onClick={handleButtonClick}>
+        <Button onClick={handleButtonClick} onDoubleClick={handleDoubleClick}>
             {movieData ? (
                     <Row>
                         <Column>
