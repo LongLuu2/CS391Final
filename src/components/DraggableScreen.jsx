@@ -2,25 +2,19 @@ import Draggable from 'react-draggable';
 import styled from "styled-components"
 import {useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
+import MovieButton from "../MovieButton.jsx";
 
-const Button = styled.button`
+const StyledHeader = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background: transparent;
-  color: mediumpurple;
-  padding: 10px;
-  height: 50px;
-  width: 100px;
-  line-height: 2;
-  border-radius: 5px;
-  font-weight: bold;
-  border: 4px solid mediumpurple;
-  font-size: inherit;
-  cursor: pointer;
+  justify-content: space-between;
+  margin: 20px;
+  font-size: 15px;
+`;
+const StyledTitle = styled.h1`
+  text-align: right;
 `;
 
-export const GameScreen = styled.div`
+const GameScreen = styled.div`
   height: 100vh;
   width: 100vw;
   display: flex;
@@ -31,7 +25,7 @@ export const GameScreen = styled.div`
   }
 `;
 
-export const MainScreen = styled.div`
+const MainScreen = styled.div`
   height: 100%;
   width: 75%;
 
@@ -41,7 +35,7 @@ export const MainScreen = styled.div`
   }
 `;
 
-export const SideBar = styled.div`
+const SideBar = styled.div`
   height: 100%;
   width: 25%;
   border-left: 1px solid #9f9f9f;
@@ -56,7 +50,7 @@ export const SideBar = styled.div`
   }
 `;
 
-export const CraftedButtons = styled.div`
+const CraftedButtons = styled.div`
   height: wrap-content;
   width: 100%;
   display: flex;
@@ -89,11 +83,14 @@ const handleClick = (e) => {
 };
 
 export default function DraggableScreen() {
+    // Hold the buttons and their references to use their positions later on.
     const [buttons, setButtons] = useState([]);
     const buttonRefs = useRef({});
 
     const addDraggableButton = (event) => {
+        console.log("FCUUUCUGO:SBNKLBNGKBJSKHCXBJHDK")
         const { clientX, clientY } = event;
+        // Generate unique key for each button
         const key = uuidv4();
 
         const newButton = (
@@ -109,9 +106,9 @@ export default function DraggableScreen() {
                 <Draggable
                     onStop={(e, data) => handleStop(e, data, key)}
                 >
-                    <Button ref={ref => buttonRefs.current[key] = ref}>
-                        Move Me
-                    </Button>
+                    <div ref={ref => buttonRefs.current[key] = ref}>
+                        <MovieButton/>
+                    </div>
                 </Draggable>
             </div>
         );
@@ -133,9 +130,9 @@ export default function DraggableScreen() {
                 <Draggable
                     onStop={(e, data) => handleStop(e, data, key)}
                 >
-                    <Button ref={ref => buttonRefs.current[key] = ref}>
-                        Move Me
-                    </Button>
+                    <div ref={ref => buttonRefs.current[key] = ref}>
+                        <MovieButton/>
+                    </div>
                 </Draggable>
             </div>
         );
@@ -144,12 +141,12 @@ export default function DraggableScreen() {
     };
 
     const handleStop = (e, data, key) => {
+        //The user has picked up the mouse and we have to check if any buttons are overlapping
         const currentButton = buttonRefs.current[key];
         const currentButtonRect = currentButton.getBoundingClientRect();
 
+        //Only overlap the first pair of buttons found.
         let deleted = false;
-
-        console.log("stopped at "+ key)
 
         Object.keys(buttonRefs.current).forEach(k => {
             if (k !== key && !deleted) {
@@ -162,6 +159,7 @@ export default function DraggableScreen() {
                     currentButtonRect.top < rect.bottom &&
                     currentButtonRect.bottom > rect.top
                 ) {
+                    //Overlap found. Delete the buttons and add a new one.
                     setButtons(prevButtons => prevButtons.filter(button => button.key !== k && button.key !== key));
                     const newButtonKey = uuidv4();
                     const { left, top } = currentButtonRect;
@@ -173,6 +171,8 @@ export default function DraggableScreen() {
         });
     };
 
+    //I thought references would delete themselves if the buttons were gone but noooo.
+    //Remake button refs by going through the buttons.
     useEffect(() => {
         const newButtonRefs = {};
         buttons.forEach(button => {
@@ -186,16 +186,18 @@ export default function DraggableScreen() {
 
     return (
         <GameScreen>
-            <MainScreen />
+            <MainScreen>
+            <StyledHeader>
+                <StyledTitle>Lagtrain</StyledTitle>
+                <StyledTitle>Movie<br/>Craft</StyledTitle>
+            </StyledHeader>
+            </MainScreen>
             <SideBar>
                 <CraftedButtons>
                     {[...Array(5)].map((_, index) => (
-                        <Button
-                            key={index}
-                            onClick={addDraggableButton}
-                        >
-                            Move Me
-                        </Button>
+                        <div key={index} onClick={addDraggableButton}>
+                            <MovieButton/>
+                        </div>
                     ))}
                     <Instructions>Drag elements to craft</Instructions>
                 </CraftedButtons>
