@@ -1,7 +1,6 @@
-import Movies from './components/Movies.jsx';
-import {Route, Routes, createBrowserRouter, RouterProvider} from 'react-router-dom';
 import React, { useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
+import GameScreen from "./pages/GameScreen.jsx";
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -10,28 +9,13 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-function root() {
+function App() {
     return (
         <>
-            <GlobalStyle />
-            <Routes>
-                <Route path='/*' element={<Movies title="nemo"/>} />
-            </Routes>
+            <GlobalStyle/>
+            <GameScreen />
         </>
-    )
+    );
 }
 
-const router = createBrowserRouter(
-    [{path:"*", Component: root}]
-);
-
-function App() {
-
-  return (
-    <>
-        <RouterProvider router={router}/>
-    </>
-  )
-}
-
-export default App
+export default App;
