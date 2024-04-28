@@ -1,7 +1,6 @@
 import Draggable from 'react-draggable';
 import styled from "styled-components"
 import {useState, useRef, useEffect } from "react";
-import {NavLink} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import MovieButton from "./MovieButton.jsx";
 
