@@ -1,6 +1,6 @@
 import Draggable from 'react-draggable';
 import styled from "styled-components"
-import {useState, useRef, useEffect } from "react";
+import {useState, useRef, useEffect, cloneElement } from "react";
 import {NavLink} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import MovieButton from "./MovieButton.jsx";
@@ -96,13 +96,16 @@ export default function DraggableScreen() {
                     transform: 'translate(-50%, -50%)',
                     zIndex: 1000,
                 }}
+                onDoubleClick={(e) => createClone(e, key)}
+                onContextMenu={(e) => handleDelete(e, key)}
             >
                 <Draggable
-                    onStop={(e, data) => handleStop(e, data, key)}
+                    onStop={(e, data) => handleStop(e, data, key) }
                 >
                     <div ref={ref => buttonRefs.current[key] = ref}>
                         <MovieButton/>
                     </div>
+
                 </Draggable>
             </div>
         );
@@ -130,11 +133,24 @@ export default function DraggableScreen() {
                 ) {
                     //Overlap found. Delete the buttons and add a new one.
                     setButtons(prevButtons => prevButtons.filter(button => button.key !== k && button.key !== key));
+                    const audio = new Audio('/new-movie.mp3');
+                    audio.play();
                     addDraggableButton(e);
                     deleted = true;
                 }
             }
         });
+    };
+
+    const createClone = (e, key) => {
+        addDraggableButton(e)
+    };
+
+    const handleDelete = (e, key) => {
+        e.preventDefault();
+        const audio = new Audio('/delete-button.mp3');
+        audio.play();
+        setButtons(prevButtons => prevButtons.filter(button => button.key !== key));
     };
 
     //I thought references would delete themselves if the buttons were gone but noooo.
@@ -154,7 +170,7 @@ export default function DraggableScreen() {
         <SideBar>
             <CraftedButtons>
                 {[...Array(5)].map((_, index) => (
-                    <div key={index} onMouseDown={e => addDraggableButton(e)}>
+                    <div key={index} onClick={e => addDraggableButton(e)}>
                         <MovieButton/>
                     </div>
                 ))}

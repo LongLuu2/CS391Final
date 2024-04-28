@@ -56,8 +56,10 @@ const MovieButton = () => {
         fetchData();
     }, []);
 
-    const handleButtonClick = () => {
+    const handleButtonClick = (e) => {
         console.log("Button clicked!");
+        const audio = new Audio('/on-click.mp3');
+        audio.play();
     };
 
     const limitText = (text, maxLength) => {
