@@ -4,12 +4,6 @@ import MovieDetails from './MovieDetails.jsx';
 import NavBar from "./NavBar.jsx";
 import {useNavigate} from 'react-router-dom';
 
-const StyledRow = styled.div`
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-`;
-
 const StyledH5 = styled.h5`
     text-align: center;
 `;
@@ -37,16 +31,14 @@ export default function Movies({title}) {
     return (
         <>
             {navigate && (<NavBar goBack={() => navigate(-1)}/>)}
-            <StyledRow>
-                {loading ? (
-                    <StyledH5>Loading...</StyledH5>
-                ): (
-                    <MovieDetails
-                            key={movie.Title}
-                            movie={movie}
-                    />
-                )}
-            </StyledRow>
+            {loading ? (
+                <StyledH5>Loading...</StyledH5>
+            ): (
+                <MovieDetails
+                    key={movie.Title}
+                    movie={movie}
+                />
+            )}
         </>
     );
 }
