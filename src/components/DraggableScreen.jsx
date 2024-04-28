@@ -1,54 +1,47 @@
-import Draggable, {DraggableCore} from 'react-draggable';
+import Draggable from 'react-draggable';
 import styled from "styled-components"
-import {useState, useRef } from "react";
+import {useState, useRef, useEffect } from "react";
+import { v4 as uuidv4 } from 'uuid';
+import MovieButton from "../MovieButton.jsx";
 
-const Button = styled.button`
+const StyledHeader = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background: transparent;
-  color: mediumpurple;
-  padding: 10px;
-  height: 50px;
-  width: 100px;
-  line-height: 2;
-  border-radius: 5px;
-  font-weight: bold;
-  border: 4px solid mediumpurple;
-  font-size: inherit;
-  cursor: pointer;
+  justify-content: space-between;
+  margin: 20px;
+  font-size: 15px;
+`;
+const StyledTitle = styled.h1`
+  text-align: right;
 `;
 
-export const GameScreen = styled.div`
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: row;
-    
-   @media screen and (max-width: 900px) {
-     flex-direction: column;
-   }
+const GameScreen = styled.div`
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: row;
+
+  @media screen and (max-width: 900px) {
+    flex-direction: column;
+  }
 `;
 
-export const MainScreen = styled.div`
-    height: 100%;
-    width: 75%;
-    
-   @media screen and (max-width: 900px) {
+const MainScreen = styled.div`
+  height: 100%;
+  width: 75%;
+
+  @media screen and (max-width: 900px) {
     height: 75%;
     width: 100%;
   }
 `;
 
-export const SideBar = styled.div`
-    height: 100%;
-    width: 25%;
-    border-left: 1px solid #9f9f9f;
-    overflow-y: auto;
-
+const SideBar = styled.div`
+  height: 100%;
+  width: 25%;
+  border-left: 1px solid #9f9f9f;
+  overflow-y: auto;
   margin: 0;
   padding: 0;
-
   @media screen and (max-width: 900px) {
     height: 25%;
     width: 100%;
@@ -57,19 +50,17 @@ export const SideBar = styled.div`
   }
 `;
 
-export const CraftedButtons = styled.div`
-    height: wrap-content;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    border-left: 1px solid #9f9f9f;
-
+const CraftedButtons = styled.div`
+  height: wrap-content;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  border-left: 1px solid #9f9f9f;
   * {
     margin-right: 10px;
     margin-bottom: 10px;
   }
-
   @media screen and (max-width: 900px) {
     height: 100%;
     width: wrap-content;
@@ -92,32 +83,75 @@ const handleClick = (e) => {
 };
 
 export default function DraggableScreen() {
+    // Hold the buttons and their references to use their positions later on.
     const [buttons, setButtons] = useState([]);
-    const buttonRefs = useRef([]);
+    const buttonRefs = useRef({});
 
-    const addDraggableButton = () => {
+    const addDraggableButton = (event) => {
+        console.log("FCUUUCUGO:SBNKLBNGKBJSKHCXBJHDK")
+        const { clientX, clientY } = event;
+        // Generate unique key for each button
+        const key = uuidv4();
+
         const newButton = (
-            <Draggable
-                key={buttons.length}
-                onStop={(e, data) => handleStop(e, data, buttons.length)}
+            <div
+                key={key}
+                style={{
+                    position: 'absolute',
+                    left: clientX,
+                    top: clientY,
+                    zIndex: 1000,
+                }}
             >
-                <Button
-                    ref={el => (buttonRefs.current[buttons.length] = el)}
+                <Draggable
+                    onStop={(e, data) => handleStop(e, data, key)}
                 >
-                    Move Me
-                </Button>
-            </Draggable>
+                    <div ref={ref => buttonRefs.current[key] = ref}>
+                        <MovieButton/>
+                    </div>
+                </Draggable>
+            </div>
         );
+
         setButtons([...buttons, newButton]);
     };
 
-    const handleStop = (e, data, index) => {
-        const currentButton = buttonRefs.current[index];
+    const addNewButton = (left, top, key) => {
+        const newButton = (
+            <div
+                key={key}
+                style={{
+                    position: 'absolute',
+                    left: left + 50,
+                    top: top + 50,
+                    zIndex: 1000,
+                }}
+            >
+                <Draggable
+                    onStop={(e, data) => handleStop(e, data, key)}
+                >
+                    <div ref={ref => buttonRefs.current[key] = ref}>
+                        <MovieButton/>
+                    </div>
+                </Draggable>
+            </div>
+        );
+
+        setButtons(prevButtons => [...prevButtons, newButton]);
+    };
+
+    const handleStop = (e, data, key) => {
+        //The user has picked up the mouse and we have to check if any buttons are overlapping
+        const currentButton = buttonRefs.current[key];
         const currentButtonRect = currentButton.getBoundingClientRect();
 
-        buttonRefs.current.forEach((button, idx) => {
-            if (idx !== index) {
-                const rect = button.getBoundingClientRect();
+        //Only overlap the first pair of buttons found.
+        let deleted = false;
+
+        Object.keys(buttonRefs.current).forEach(k => {
+            if (k !== key && !deleted) {
+                console.log("comparing against "+ k)
+                const rect = buttonRefs.current[k].getBoundingClientRect();
 
                 if (
                     currentButtonRect.left < rect.right &&
@@ -125,24 +159,45 @@ export default function DraggableScreen() {
                     currentButtonRect.top < rect.bottom &&
                     currentButtonRect.bottom > rect.top
                 ) {
-                    console.log(`Buttons at index ${index} and ${idx} are overlapping.`);
+                    //Overlap found. Delete the buttons and add a new one.
+                    setButtons(prevButtons => prevButtons.filter(button => button.key !== k && button.key !== key));
+                    const newButtonKey = uuidv4();
+                    const { left, top } = currentButtonRect;
+                    addNewButton(left, top, newButtonKey);
+
+                    deleted = true;
                 }
             }
         });
     };
 
+    //I thought references would delete themselves if the buttons were gone but noooo.
+    //Remake button refs by going through the buttons.
+    useEffect(() => {
+        const newButtonRefs = {};
+        buttons.forEach(button => {
+            const key = button.key;
+            if (buttonRefs.current[key]) {
+                newButtonRefs[key] = buttonRefs.current[key];
+            }
+        });
+        buttonRefs.current = newButtonRefs;
+    }, [buttons]);
+
     return (
         <GameScreen>
-            <MainScreen />
+            <MainScreen>
+            <StyledHeader>
+                <StyledTitle>Lagtrain</StyledTitle>
+                <StyledTitle>Movie<br/>Craft</StyledTitle>
+            </StyledHeader>
+            </MainScreen>
             <SideBar>
                 <CraftedButtons>
                     {[...Array(5)].map((_, index) => (
-                        <Button
-                            key={index}
-                            onClick={addDraggableButton}
-                        >
-                            Move Me
-                        </Button>
+                        <div key={index} onClick={addDraggableButton}>
+                            <MovieButton/>
+                        </div>
                     ))}
                     <Instructions>Drag elements to craft</Instructions>
                 </CraftedButtons>
