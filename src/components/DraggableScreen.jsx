@@ -4,6 +4,7 @@ import {NavLink} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import MovieButton from "./MovieButton.jsx";
 import {useState, useRef, useEffect } from "react";
+import useMovieManager from "../hooks/useMovieManager.jsx";
 
 const SideBar = styled.div`
     height: 100%;
@@ -46,6 +47,10 @@ const Instructions = styled.h2`
     border: 1px solid #9f9f9f;
 `
 
+export const StyledButton = styled.button`
+    margin: 10px;
+`;
+
 const StyledNavLink = styled.a`
     transition: all 0.5s;
     cursor: pointer;
@@ -78,11 +83,12 @@ const handleClick = (e) => {
 };
 
 export default function DraggableScreen() {
+    const { movies, addMovie, clearMovies} = useMovieManager();
     // Hold the buttons and their references to use their positions later on.
     const [buttons, setButtons] = useState([]);
     const buttonRefs = useRef({});
 
-    const addDraggableButton = ({ clientX, clientY }) => {
+    const addDraggableButton = ({ clientX, clientY }, movieId) => {
         // Generate unique key for each button
         const key = uuidv4();
 
@@ -102,7 +108,7 @@ export default function DraggableScreen() {
                     onStop={(e, data) => handleStop(e, data, key) }
                 >
                     <div ref={ref => buttonRefs.current[key] = ref}>
-                        <MovieButton/>
+                        <MovieButton movieId={movieId}/>
                     </div>
 
                 </Draggable>
@@ -161,15 +167,36 @@ export default function DraggableScreen() {
         buttonRefs.current = newButtonRefs;
     }, [buttons]);
 
+    const [buttonText, setButtonText] = useState("Random Movie");
+    const handleClick = async() => {
+        const movieIds = ['tt0110912', 'tt1160419', 'tt3783958'];
+        const randomMovieId = movieIds[Math.floor(Math.random() * movieIds.length)];
+        await addMovie(randomMovieId);
+    };
+    const handleClicky = () => {
+        clearMovies();
+    };
+
     return (
         <SideBar>
             <CraftedButtons>
-                {[...Array(5)].map((_, index) => (
+                {/*{[...Array(5)].map((_, index) => (
                     <div key={index} onClick={e => addDraggableButton(e)}>
                         <MovieButton/>
                     </div>
+                ))}*/}
+                {movies.map((movie, index) => (
+                    <div key={index} onClick={(e) => addDraggableButton(e, movie.id)}>
+                        <MovieButton movieId={movie.id} />
+                    </div>
                 ))}
             </CraftedButtons>
+            <StyledButton onClick={handleClick}>
+                {buttonText}
+            </StyledButton>
+            <StyledButton onClick={handleClicky}>
+                NukeMovies
+            </StyledButton>
             {buttons.map(button => button)}
         </SideBar>
     );
