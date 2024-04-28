@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 
 const useMovieManager = () => {
   const [movies, setMovies] = useState([]);
+  const [movieData, setMovieData] = useState(null);
 
+  // Load movies from local storage when component mounts
   useEffect(() => {
     const storedMovies = JSON.parse(localStorage.getItem('movies'));
     if (storedMovies) {
@@ -10,12 +12,13 @@ const useMovieManager = () => {
     }
   }, []);
 
-  const addMovie = async (name, imageUrl) => {
-    const movieData = await fetchMovieData(name);
+  const addMovie = async (movieId) => {
+    await console.log(movieId);
+    const movieData = await fetchMovieData(movieId);
 
     const movie = {
-      name: name,
-      imageUrl: imageUrl,
+      id: movieId,
+      //imageUrl: imageUrl,
       ...movieData
     };
 
@@ -26,11 +29,28 @@ const useMovieManager = () => {
     setMovies(updatedMovies);
   };
 
-  const fetchMovieData = async (name) => {
-    return { rating: 'PG-13', year: 2023 };
+  const clearMovies = async () => {
+    localStorage.removeItem('movies');
+    setMovies([]);
   };
 
-  return { movies, addMovie };
+  const fetchMovieData = async (movieId) => {
+    const API_KEY = '7a644baa';
+    try {
+      const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${movieId}`);
+      const jsonData = await response.json();
+      setMovieData(jsonData);
+      console.log(jsonData);
+      return jsonData.toString();
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return null;
+    }
+    //return { rating: 'PG-13', year: 2023 };
+  };
+
+  return { movies, addMovie, clearMovies, fetchMovieData};
 };
 
 export default useMovieManager;
+
