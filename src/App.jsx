@@ -6,34 +6,34 @@ import Movies from "./pages/Movies";
 
 
 const GlobalStyle = createGlobalStyle`
-  * {
-    margin: 0;
-    box-sizing: border-box;
-  }
+    * {
+        margin: 0;
+        box-sizing: border-box;
+    }
 `;
 function Root() {
-  return(
-    <>
-    <GlobalStyle/>
-    <Header/>
-    <Routes>
-      /*adds routes */
-      <Route path ='/' element = {<GameScreen/>}/>
-      <Route path = 'Movies' element = {<Movies/>}/>
-    </Routes>
-    </>
-  )
+    return(
+        <>
+            <GlobalStyle/>
+            <Header/>
+            <Routes>
+                /*adds routes */
+                <Route path ='/' element = {<GameScreen/>}/>
+                <Route path = 'Movies' element = {<Movies/>}/>
+            </Routes>
+        </>
+    )
 }
 
 const router = createBrowserRouter([
-  {path:'*', Component: Root}
+    {path:'*', Component: Root}
 ])
 
 function App() {
 
-  return (
-    <RouterProvider router ={router}/>
-  )
+    return (
+        <RouterProvider router ={router}/>
+    )
 }
 
 export default App

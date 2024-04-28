@@ -7,7 +7,7 @@ const StyledDiv = styled.div`
     width: 100%;
     padding: 10px;
     justify-content: center;
-    //margin-top: 10%;
+    margin-bottom: 8%;
 `;
 
 const StyledCard = styled.div`

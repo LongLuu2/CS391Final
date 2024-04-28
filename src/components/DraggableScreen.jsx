@@ -6,67 +6,67 @@ import MovieButton from "./MovieButton.jsx";
 import {useState, useRef, useEffect } from "react";
 
 const SideBar = styled.div`
-  height: 100%;
-  width: 25%;
-  border-left: 1px solid #9f9f9f;
-  overflow-y: auto;
-  margin: 0;
-  padding: 0;
-  @media screen and (max-width: 900px) {
-    height: 25%;
-    width: 100%;
-    border-top: 1px solid #9f9f9f;
-    overflow-x: auto;
-  }
+    height: 100%;
+    width: 25%;
+    border-left: 1px solid #9f9f9f;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    @media screen and (max-width: 900px) {
+        height: 25%;
+        width: 100%;
+        border-top: 1px solid #9f9f9f;
+        overflow-x: auto;
+    }
 `;
 
 const CraftedButtons = styled.div`
-  height: wrap-content;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  border-left: 1px solid #9f9f9f;
-  
-  * {
-    margin-right: 10px;
-    margin-bottom: 10px;
-  }
-  @media screen and (max-width: 900px) {
-    height: 100%;
-    flex-direction: column;
-    width: wrap-content;
-    border-top: 1px solid #9f9f9f;
-  }
+    height: wrap-content;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-left: 1px solid #9f9f9f;
+
+    * {
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    @media screen and (max-width: 900px) {
+        height: 100%;
+        flex-direction: column;
+        width: wrap-content;
+        border-top: 1px solid #9f9f9f;
+    }
 `;
 
 const Instructions = styled.h2`
-  height: 100px;
-  width: 200px;
-  border: 1px solid #9f9f9f;
+    height: 100px;
+    width: 200px;
+    border: 1px solid #9f9f9f;
 `
 
 const StyledNavLink = styled.a`
-  transition: all 0.5s;
-  cursor: pointer;
-  position: relative;
-
-  &:after {
-    content: '»';
-    position: absolute;
-    opacity: 0;
-    right: -25px;
-    transition: 0.5s;
-  }
-
-  &:hover {
-    padding-right: 25px;
+    transition: all 0.5s;
+    cursor: pointer;
+    position: relative;
 
     &:after {
-      opacity: 1;
-      right: 10px;
+        content: '»';
+        position: absolute;
+        opacity: 0;
+        right: -25px;
+        transition: 0.5s;
     }
-  }
+
+    &:hover {
+        padding-right: 25px;
+
+        &:after {
+            opacity: 1;
+            right: 10px;
+        }
+    }
 `;
 
 const handleClick = (e) => {
