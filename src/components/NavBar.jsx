@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import Button from './Button.jsx';
+import NavButton from './NavButton.jsx';
 
 const StyledWrapper = styled.div`
     width: 100%;
@@ -14,7 +14,7 @@ const StyledTitle = styled.h1`
     margin-left: 30%;
 `;
 
-const StyledButton = styled(Button)`
+const StyledButton = styled(NavButton)`
     margin-left: 5%;
     height: 50%;
 `;

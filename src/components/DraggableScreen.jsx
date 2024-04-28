@@ -2,7 +2,7 @@ import Draggable from 'react-draggable';
 import styled from "styled-components"
 import {useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import MovieButton from "../MovieButton.jsx";
+import MovieButton from "./MovieButton.jsx";
 
 const StyledHeader = styled.div`
   display: flex;

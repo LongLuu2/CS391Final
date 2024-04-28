@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const Button = styled.button`
+const NavButton = styled.button`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,4 +12,4 @@ const Button = styled.button`
     font-size: calc(8px + 1vmin);
 `;
 
-export default Button;
+export default NavButton;
