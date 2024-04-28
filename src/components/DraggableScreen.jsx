@@ -1,9 +1,9 @@
 import Draggable from 'react-draggable';
 import styled from "styled-components"
-import {useState, useRef, useEffect, cloneElement } from "react";
 import {NavLink} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import MovieButton from "./MovieButton.jsx";
+import {useState, useRef, useEffect } from "react";
 
 const SideBar = styled.div`
   height: 100%;
@@ -96,7 +96,6 @@ export default function DraggableScreen() {
                     transform: 'translate(-50%, -50%)',
                     zIndex: 1000,
                 }}
-                onDoubleClick={(e) => createClone(e, key)}
                 onContextMenu={(e) => handleDelete(e, key)}
             >
                 <Draggable
@@ -140,10 +139,6 @@ export default function DraggableScreen() {
                 }
             }
         });
-    };
-
-    const createClone = (e, key) => {
-        addDraggableButton(e)
     };
 
     const handleDelete = (e, key) => {

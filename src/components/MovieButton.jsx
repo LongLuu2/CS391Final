@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-
+import BubbleNav from './BubbleNav';
 const Button = styled.button`
     display: flex;
     align-items: center;
@@ -40,12 +40,18 @@ const Row = styled.div`
 const MovieButton = () => {
     const [movieData, setMovieData] = useState(null);
     const API_KEY = '7a644baa';
-    const MOVIE_ID = 'tt3896198';
+    const MOVIE_ID = 'nemo';
+
+    //for NavBubble visiblity
+    const [isVisible, setIsVisible] = useState(false);
+    const toggle = () => {
+        setIsVisible(!isVisible);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${MOVIE_ID}`);
+                const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&t=${MOVIE_ID}`);
                 const jsonData = await response.json();
                 setMovieData(jsonData);
             } catch (error) {
@@ -62,6 +68,10 @@ const MovieButton = () => {
         audio.play();
     };
 
+    const handleDoubleClick = () => {
+        toggle();
+    };
+
     const limitText = (text, maxLength) => {
         if (text.length <= maxLength) {
             return text;
@@ -71,7 +81,8 @@ const MovieButton = () => {
     };
 ///
     return (
-        <Button onClick={handleButtonClick}>
+        <>
+        <Button onClick={handleButtonClick} onDoubleClick={handleDoubleClick}>
             {movieData ? (
                     <Row>
                         <Column>
@@ -84,7 +95,9 @@ const MovieButton = () => {
             ) : (
                 <div>Loading...</div>
             )}
-        </Button>
+        </Button> 
+        {isVisible && <BubbleNav movieTitle={movieData ? movieData.Title : ''}/>}
+        </>
 
 );
 };

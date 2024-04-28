@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import {createBrowserRouter, Route, RouterProvider, Routes} from "react-router-dom";
+import Header from "./components/Header";
+import GameScreen from "./pages/GameScreen"
 import styled, { createGlobalStyle } from 'styled-components';
-import GameScreen from "./pages/GameScreen.jsx";
+import Movies from "./pages/Movies";
+
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -8,14 +11,29 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 `;
-
-function App() {
-  return (
-      <>
-        <GlobalStyle/>
-        <GameScreen />
-      </>
-  );
+function Root() {
+  return(
+    <>
+    <GlobalStyle/>
+    <Header/>
+    <Routes>
+      /*adds routes */
+      <Route path ='/' element = {<GameScreen/>}/>
+      <Route path = 'Movies' element = {<Movies/>}/>
+    </Routes>
+    </>
+  )
 }
 
-export default App;
+const router = createBrowserRouter([
+  {path:'*', Component: Root}
+])
+
+function App() {
+
+  return (
+    <RouterProvider router ={router}/>
+  )
+}
+
+export default App
