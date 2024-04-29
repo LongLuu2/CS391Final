@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react';
+import OpenAI from "openai";
 
 const useMovieManager = () => {
   const [movies, setMovies] = useState([]);
-  const [movieData, setMovieData] = useState(null);
+
+  const openai = new OpenAI({
+    apiKey: '<API-KEY>',
+    dangerouslyAllowBrowser: true,
+  })
 
   // Load movies from local storage when component mounts
   useEffect(() => {
@@ -39,9 +44,7 @@ const useMovieManager = () => {
     try {
       const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${movieId}`);
       const jsonData = await response.json();
-      setMovieData(jsonData);
-      console.log(jsonData);
-      return jsonData.toString();
+      return jsonData;
     } catch (error) {
       console.error('Error fetching data:', error);
       return null;
@@ -49,7 +52,32 @@ const useMovieManager = () => {
     //return { rating: 'PG-13', year: 2023 };
   };
 
-  return { movies, addMovie, clearMovies, fetchMovieData};
+  const merge = async (content) => {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          "role": "system", "content": "You are a function that ingests information about two different" +
+              " movies, \"Movie A\" & \"Movie B\" and returns a third movie \"Movie C\" that is most similar /" +
+              " relevant to the two given movies. IMPORTANT: Return just the movie Title and nothing else in" +
+              " the format \"Movie C:<Insert Movie Title>\"."
+        },
+        {"role": "user", "content": content}
+      ],
+      stream: true,
+    });
+
+    let movieTitles = [];
+
+    for await (const chunk of completion) {
+      console.log(chunk.choices[0].delta.content);
+      movieTitles.push(chunk.choices[0].delta.content);
+    }
+
+    return movieTitles;
+  };
+
+  return { movies, addMovie, clearMovies, fetchMovieData, merge};
 };
 
 export default useMovieManager;

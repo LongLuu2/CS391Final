@@ -9,15 +9,15 @@ const openai = new OpenAI({
 Example setup for calling openAI api
 Reference Used: (https://platform.openai.com/docs/api-reference/chat/create)
 1. Add import statement
-	import { main } from "./CombineLogic"
+	import { merge } from "./CombineLogic"
 
-2. Prep data to be passed to function main(...) w/ content being the Movies
+2. Prep data to be passed to function merge(...) w/ content being the Movies
 	const movieA = 'Finding Nemo';
     const movieB = 'Star Wars';
     const content = `Movie A: ${movieA}. Movie B: ${movieB}`;
     const [buttonText, setButtonText] = useState("New Cards");
     const handleClick = async() => {
-        const newButtonText = await main(content);
+        const newButtonText = await merge(content);
         setButtonText(newButtonText.slice(4));
     };
 
@@ -28,7 +28,7 @@ Reference Used: (https://platform.openai.com/docs/api-reference/chat/create)
 	</StyledButton>
 */}
 
-export async function main(content) {
+export async function merge(content) {
 
 	const completion = await openai.chat.completions.create({
 		model: "gpt-3.5-turbo",
@@ -54,4 +54,4 @@ export async function main(content) {
 	return movieTitles;
 }
 
-main();
+merge();
