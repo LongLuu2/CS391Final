@@ -35,7 +35,7 @@ const CraftedButtons = styled.div`
 
   div {
     margin-right: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 3px;
   }
   
   @media screen and (max-width: 900px) {

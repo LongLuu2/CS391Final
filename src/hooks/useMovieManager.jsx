@@ -6,7 +6,7 @@ const useMovieManager = () => {
   const { movies, setMovies } = useMovieContext();
 
   const openai = new OpenAI({
-    apiKey: 'sk-proj-2kU0MNkd6Pgz1RVgHd1NT3BlbkFJMii0qvUON1IlRxyPyGxA',
+    apiKey: 'sk-proj-UNtXj4Vrm01cWamMXcFIT3BlbkFJKn4uctLw05cTouZvgjVN',
     dangerouslyAllowBrowser: true,
   })
 

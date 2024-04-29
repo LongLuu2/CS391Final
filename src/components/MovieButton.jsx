@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BubbleNav from './BubbleNav';
 import PropTypes from "prop-types";
+import useSWR from 'swr';
 
 const Button = styled.button`
     display: flex;
@@ -13,7 +14,7 @@ const Button = styled.button`
     width: 150px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.5s;
 
     &:hover {
         background: linear-gradient(to bottom, #ffffff, rgba(89, 165, 216, 0.5));
@@ -21,8 +22,10 @@ const Button = styled.button`
 `;
 
 const ButtonImg = styled.img`
-    width: 30px;
-    height: auto;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 50%;
     margin-right: 10px;
     align-self: center;
     pointer-events: none;
@@ -35,31 +38,45 @@ const ButtonText = styled.p`
     text-align: left;
     pointer-events: none;
 `
-
+const ImageColumn = styled.div`
+    flex: 50%;
+    padding-right: 10px;
+    margin-left: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+`;
+const TextColumn = styled.div`
+    flex: 50%;
+    padding-top: 2px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+`;
+const Row = styled.div`
+    display: flex;
+`;
 const MovieButton = ({ movieId }) => {
-    const [movieData, setMovieData] = useState(null);
+    
     const API_KEY = '7a644baa';
     //const MOVIE_ID = 'nemo';
 
+    
     //for NavBubble visiblity
     const [isVisible, setIsVisible] = useState(false);
     const toggle = () => {
         setIsVisible(!isVisible);
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${movieId}`);
-                const jsonData = await response.json();
-                setMovieData(jsonData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        fetchData();
-    }, [movieId]);
+    const {data, error} =
+        useSWR(`http://www.omdbapi.com/?apikey=7a644baa&i=${movieId}`,
+            (url) =>
+                fetch(url).then((res) => res.json())
+        );
+    
+    if (error) return <div><p>Failed to Load</p></div>;
+    if (!data) return <div><p>Please Be Patient -- Loading...</p></div>;
 
     const handleButtonClick = (e) => {
         console.log("Button clicked!");
@@ -70,7 +87,8 @@ const MovieButton = ({ movieId }) => {
     const handleDoubleClick = () => {
         toggle();
     };
-
+    
+    const { Title, Poster } = data;
     const limitText = (text, maxLength) => {
         if (text == null) {
             return "";
@@ -84,16 +102,16 @@ const MovieButton = ({ movieId }) => {
     return (
         <>
             <Button onClick={handleButtonClick} onDoubleClick={handleDoubleClick}>
-                {movieData ? (
-                    <>
-                        <ButtonImg src={movieData.Poster} alt="Poster"/>
-                        <ButtonText>{limitText(movieData.Title, 40)}</ButtonText>
-                    </>
-                ) : (
-                    <div>Loading...</div>
-                )}
+                <Row>
+                    <ImageColumn>
+                        <ButtonImg src={Poster} alt="Poster"/>
+                    </ImageColumn>
+                    <TextColumn>
+                     <ButtonText>{limitText(Title, 20)}</ButtonText>
+                 </TextColumn>
+                </Row>
             </Button>
-            {isVisible && <BubbleNav movieTitle={movieData ? movieData.Title : ''}/>}
+            {isVisible && <BubbleNav movieTitle={Title}/>}
         </>
 
     );
