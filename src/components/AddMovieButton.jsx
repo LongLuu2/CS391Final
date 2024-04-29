@@ -23,7 +23,6 @@ const AddButton = styled.div`
 
 export default function AddMovieButton({onClick}) {
     const handleButtonClick = (e) => {
-        console.log("AAAAAAAHH!");
         const audio = new Audio('/on-click.mp3');
         audio.play();
         onClick(e);

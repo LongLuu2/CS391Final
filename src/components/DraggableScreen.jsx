@@ -4,8 +4,9 @@ import {NavLink} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import MovieButton from "./MovieButton.jsx";
 import AddMovieButton from "./AddMovieButton.jsx";
-import {useState, useRef, useEffect } from "react";
+import SearchBar from './SearchBar.jsx';
 import useMovieManager from "../hooks/useMovieManager.jsx";
+import {useState, useRef, useEffect } from "react";
 
 const SideBar = styled.div`
     height: 100%;
@@ -42,14 +43,12 @@ const CraftedButtons = styled.div`
     width: wrap-content;
     flex-direction: column;
   }
+  
 `
+
 const MovieButtonWrapper = styled.div`
   position: absolute;
   z-index: 1;
-`;
-
-export const StyledButton = styled.button`
-    margin: 10px;
 `;
 
 const StyledForm = styled.form`
@@ -66,12 +65,11 @@ const StyledInput = styled.input`
 `;
 
 export default function DraggableScreen() {
-    const { movies, addMovie, clearMovies, merge} = useMovieManager();
+    const { movies, addMovie, merge, fetchMovieId} = useMovieManager();
     // Hold the buttons and their references to use their positions later on.
     const [buttons, setButtons] = useState({});
     const [numAddButtons, setNumAddButtons] = useState(4);
-
-    const [query, setQuery] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
 
     const buttonRefs = useRef({});
 
@@ -98,7 +96,7 @@ export default function DraggableScreen() {
                             ref={ref => buttonRefs.current[key] = ref}
                             onContextMenu={(e) => handleDelete(e, key)}
                         >
-                            <MovieButton movieId={movieId} onContextMenu={(e) => handleDelete(e, key)}/>
+                            <MovieButton movieId={movieId}/>
                         </MovieButtonWrapper>
                     </Draggable>
                 )
@@ -141,6 +139,7 @@ export default function DraggableScreen() {
         e.preventDefault();
         const audio = new Audio('/delete-button.mp3');
         audio.play();
+
         setButtons(prevButtons => {
             const updatedButtons = { ...prevButtons };
             delete updatedButtons[key];
@@ -174,14 +173,32 @@ export default function DraggableScreen() {
         addDraggableButton(e, newMovieId);
     }
 
-    const randomMovie = async() => {
-        const movieIds = ['tt0110912', 'tt1160419', 'tt3783958'];
-        const randomMovieId = movieIds[Math.floor(Math.random() * movieIds.length)];
-        await addMovie(randomMovieId);
+    const newMovie = async() => {
+        if (searchTerm === "" || searchTerm === null) {
+            return;
+        }
+        const movieId = await fetchMovieId(searchTerm)
+
+        if (movieId === null) {
+            return;
+        }
+
+        const movieExists = movies.some(movie => movie.id === movieId);
+
+        if (!movieExists) {
+            const audio = new Audio('/new-movie.mp3');
+            audio.play();
+            await addMovie(movieId);
+        }
+        setSearchTerm("");
     };
-    const handleClicky = () => {
-        clearMovies();
+
+    const handleFormChange = event => {
+        setSearchTerm(event.target.value);
     };
+
+    useEffect(() => {
+    }, [movies]);
 
     //I thought references would delete themselves if the buttons were gone but noooo.
     //Remake button refs by going through them.
@@ -200,29 +217,22 @@ export default function DraggableScreen() {
     return (
         <SideBar>
             <CraftedButtons>
-                {movies.map((movie, index) => (
-                    typeof movie.id === 'string' && (
-                        <div key={index} onClick={(e) => addDraggableButton(e, movie.id)}>
-                            <MovieButton movieId={movie.id} />
-                        </div>
-                    )
-                ))}
+                {movies
+                    .filter(movie => movie.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                    .map((movie, index) => (
+                        typeof movie.id === 'string' && (
+                            <div key={index} onClick={(e) => addDraggableButton(e, movie.id)}>
+                                <MovieButton movieId={movie.id} />
+                            </div>
+                        )
+                    ))}
 
                 {[...Array(numAddButtons)].map((_, index) => (
-                    <AddMovieButton key={index} onClick={randomMovie}/>
+                    <AddMovieButton key={index} onClick={newMovie}/>
                 ))}
-
-                <StyledButton onClick={handleClicky}>
-                    NukeMovies
-                </StyledButton>
             </CraftedButtons>
 
-            <StyledForm>
-                <label>
-                    <StyledInput type="text" name="name" placeholder="Search Items" />
-                </label>
-            </StyledForm>
-
+            <SearchBar searchTerm={searchTerm} handleFormChange={handleFormChange} />
             {Object.values(buttons).map(button => button.button)}
         </SideBar>
     );

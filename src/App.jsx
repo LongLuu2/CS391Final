@@ -2,6 +2,7 @@ import {createBrowserRouter, Route, RouterProvider, Routes} from "react-router-d
 import GameScreen from "./pages/GameScreen"
 import { createGlobalStyle } from 'styled-components';
 import Movies from "./pages/Movies";
+import {MovieProvider} from "./context/MoviesContext.jsx";
 
 
 const GlobalStyle = createGlobalStyle`
@@ -14,11 +15,13 @@ function Root() {
   return(
     <>
     <GlobalStyle/>
-    <Routes>
-      /*adds routes */
-      <Route path ='/' element = {<GameScreen/>}/>
-      <Route path = 'Movies' element = {<Movies/>}/>
-    </Routes>
+    <MovieProvider>
+        <Routes>
+          /*adds routes */
+          <Route path ='/' element = {<GameScreen/>}/>
+          <Route path = 'Movies' element = {<Movies/>}/>
+        </Routes>
+    </MovieProvider>
     </>
   )
 }

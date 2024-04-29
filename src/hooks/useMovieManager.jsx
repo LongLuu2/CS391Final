@@ -1,8 +1,9 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useContext} from 'react';
+import {useMovieContext} from "../context/MoviesContext.jsx";
 import OpenAI from "openai";
 
 const useMovieManager = () => {
-  const [movies, setMovies] = useState([]);
+  const { movies, setMovies } = useMovieContext();
 
   const openai = new OpenAI({
     apiKey: 'sk-proj-2kU0MNkd6Pgz1RVgHd1NT3BlbkFJMii0qvUON1IlRxyPyGxA',
@@ -49,12 +50,12 @@ const useMovieManager = () => {
   };
 
   const fetchMovieId = async (name) => {
+    console.log(name);
     try {
       const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&t=${name}`);
-      const body = await response.json()
+      const body = await response.json();
       return body.imdbID;
     } catch (error) {
-      console.error('Error fetching data:', error);
       return null;
     }
   };
@@ -90,7 +91,7 @@ const useMovieManager = () => {
     return await fetchMovieId(movieTitles.join(''));
   };
 
-  return { movies, addMovie, clearMovies, fetchMovieDataById, merge};
+  return { movies, addMovie, clearMovies, fetchMovieDataById, merge, fetchMovieId};
 };
 
 export default useMovieManager;
