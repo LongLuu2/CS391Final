@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 
 const StyledForm = styled.form`
@@ -17,7 +16,15 @@ const StyledInput = styled.input`
   background-size: 22px;
 `
 
-const SearchBar = ({ searchTerm, handleFormChange }) => {
+const SearchBar = ({ searchTerm, handleFormChange, onSubmit }) => {
+
+    const handleSubmit = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            onSubmit();
+        }
+    };
+
     return (
         <StyledForm>
             <label>
@@ -26,6 +33,7 @@ const SearchBar = ({ searchTerm, handleFormChange }) => {
                     name="name"
                     placeholder="Search Items"
                     value={searchTerm}
+                    onKeyDown={handleSubmit}
                     onChange={handleFormChange}
                 />
             </label>

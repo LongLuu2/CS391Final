@@ -1,6 +1,5 @@
 import Draggable from 'react-draggable';
 import styled from "styled-components"
-import {NavLink} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import MovieButton from "./MovieButton.jsx";
 import AddMovieButton from "./AddMovieButton.jsx";
@@ -26,7 +25,6 @@ const SideBar = styled.div`
 `;
 
 const CraftedButtons = styled.div`
-  height: wrap-content;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -40,7 +38,6 @@ const CraftedButtons = styled.div`
   
   @media screen and (max-width: 900px) {
     height: 100%;
-    width: wrap-content;
     flex-direction: column;
   }
   
@@ -51,24 +48,10 @@ const MovieButtonWrapper = styled.div`
   z-index: 1;
 `;
 
-const StyledForm = styled.form`
-  width: 100%;
-  position: absolute;
-  bottom: 0;
-  height: wrap-content;
-`;
-
-const StyledInput = styled.input`
-  width: 100%;
-  font-size: 16px;
-  padding: 10px;
-`;
-
 export default function DraggableScreen() {
-    const { movies, addMovie, merge, fetchMovieId} = useMovieManager();
+    const { movies, addMovie, merge, fetchMovieId, numAddMovies, decrementAddMovie} = useMovieManager();
     // Hold the buttons and their references to use their positions later on.
     const [buttons, setButtons] = useState({});
-    const [numAddButtons, setNumAddButtons] = useState(4);
     const [searchTerm, setSearchTerm] = useState("");
 
     const buttonRefs = useRef({});
@@ -109,15 +92,15 @@ export default function DraggableScreen() {
         }
     };
 
-    const handleStop = (e, data, key, movieId) => {
-        //User has picked up the mouse and we have to check if any buttons are overlapping
+    const handleStop = async (e, data, key, movieId) => {
+        //User has picked up the mouse, and we have to check if any buttons are overlapping
         const currentButton = buttonRefs.current[key];
 
         const currentButtonRect = currentButton.getBoundingClientRect();
 
         //Only overlap the first pair of buttons found.
         let deleted = false;
-        Object.keys(buttonRefs.current).forEach(k => {
+        for (const k of Object.keys(buttonRefs.current)) {
             if (k !== key && !deleted) {
                 const rect = buttonRefs.current[k].getBoundingClientRect();
 
@@ -128,20 +111,20 @@ export default function DraggableScreen() {
                     currentButtonRect.bottom > rect.top
                 ) {
                     //Overlap found. Delete the buttons and add a new one.
-                    overlap(e, k, key, movieId)
+                    await overlap(e, k, key, movieId)
                     deleted = true;
                 }
             }
-        });
+        }
     };
 
-    const handleDelete = (e, key) => {
+    const handleDelete = async (e, key) => {
         e.preventDefault();
         const audio = new Audio('/delete-button.mp3');
-        audio.play();
+        await audio.play();
 
         setButtons(prevButtons => {
-            const updatedButtons = { ...prevButtons };
+            const updatedButtons = {...prevButtons};
             delete updatedButtons[key];
             return updatedButtons;
         });
@@ -149,7 +132,7 @@ export default function DraggableScreen() {
 
     const overlap = async (e, k, key, movieId) => {
         const movieId1 = movieId;
-        const movieId2 = buttons[k].movieId;
+        const movieId2 = await buttons[k].movieId;
 
         const newMovieId = await merge(movieId1, movieId2)
         console.log("new movie id", newMovieId)
@@ -159,7 +142,7 @@ export default function DraggableScreen() {
         if (!movieExists) {
             console.log("true")
             const audio = new Audio('/new-movie.mp3');
-            audio.play();
+            await audio.play();
             await addMovie(newMovieId);
         }
 
@@ -187,9 +170,11 @@ export default function DraggableScreen() {
 
         if (!movieExists) {
             const audio = new Audio('/new-movie.mp3');
-            audio.play();
+            await audio.play();
             await addMovie(movieId);
+            await decrementAddMovie();
         }
+
         setSearchTerm("");
     };
 
@@ -200,12 +185,11 @@ export default function DraggableScreen() {
     useEffect(() => {
     }, [movies]);
 
-    //I thought references would delete themselves if the buttons were gone but noooo.
+    //I thought references would delete themselves if the buttons were gone but no.
     //Remake button refs by going through them.
     useEffect(() => {
         const newButtonRefs = {};
         Object.keys(buttons).forEach(key => {
-            const button = buttons[key];
             const ref = buttonRefs.current[key];
             if (ref) {
                 newButtonRefs[key] = ref;
@@ -227,12 +211,13 @@ export default function DraggableScreen() {
                         )
                     ))}
 
-                {[...Array(numAddButtons)].map((_, index) => (
+                {[...Array(numAddMovies)].map((_, index) => (
                     <AddMovieButton key={index} onClick={newMovie}/>
                 ))}
+
             </CraftedButtons>
 
-            <SearchBar searchTerm={searchTerm} handleFormChange={handleFormChange} />
+            <SearchBar searchTerm={searchTerm} handleFormChange={handleFormChange} onSubmit={newMovie}/>
             {Object.values(buttons).map(button => button.button)}
         </SideBar>
     );

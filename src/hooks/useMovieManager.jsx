@@ -1,12 +1,13 @@
-import {useEffect, useState, useContext} from 'react';
+import {useEffect, useState} from 'react';
 import {useMovieContext} from "../context/MoviesContext.jsx";
 import OpenAI from "openai";
 
 const useMovieManager = () => {
   const { movies, setMovies } = useMovieContext();
+  const [numAddMovies, setNumAddMovies] = useState(4);
 
   const openai = new OpenAI({
-    apiKey: 'sk-proj-2kU0MNkd6Pgz1RVgHd1NT3BlbkFJMii0qvUON1IlRxyPyGxA',
+    apiKey: "",
     dangerouslyAllowBrowser: true,
   })
 
@@ -14,10 +15,16 @@ const useMovieManager = () => {
 
   useEffect(() => {
     const storedMovies = JSON.parse(localStorage.getItem('movies'));
+    const moviesLeft = JSON.parse(localStorage.getItem('left'));
+
     if (storedMovies) {
       setMovies(storedMovies);
     }
-  }, []);
+
+    if (moviesLeft) {
+      setNumAddMovies(parseInt(moviesLeft));
+    }
+  }, [setMovies]);
 
   const addMovie = async (movieId) => {
     const movieData = await fetchMovieDataById(movieId);
@@ -34,9 +41,17 @@ const useMovieManager = () => {
     setMovies(updatedMovies);
   };
 
+  const decrementAddMovie = async () => {
+    const updatedNumAddMovies = numAddMovies - 1;
+    localStorage.setItem('left', updatedNumAddMovies.toString());
+    setNumAddMovies(updatedNumAddMovies);
+  };
+
   const clearMovies = async () => {
     localStorage.removeItem('movies');
+    localStorage.removeItem('left');
     setMovies([]);
+    setNumAddMovies(4);
   };
 
   const fetchMovieDataById = async (movieId) => {
@@ -91,7 +106,8 @@ const useMovieManager = () => {
     return await fetchMovieId(movieTitles.join(''));
   };
 
-  return { movies, addMovie, clearMovies, fetchMovieDataById, merge, fetchMovieId};
+  return { movies, numAddMovies, addMovie, clearMovies, fetchMovieDataById, merge, fetchMovieId, decrementAddMovie };
+
 };
 
 export default useMovieManager;
