@@ -34,7 +34,7 @@ const CraftedButtons = styled.div`
   padding: 8px;
 
   div {
-    margin-right: 10px;
+    margin-right: 4px;
     margin-bottom: 3px;
   }
   
