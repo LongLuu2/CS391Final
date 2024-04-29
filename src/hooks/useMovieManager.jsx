@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import OpenAI from "openai";
 
 const useMovieManager = () => {
   const [movies, setMovies] = useState([]);
 
   const openai = new OpenAI({
-    apiKey: '<API-KEY>',
+    apiKey: 'sk-proj-2kU0MNkd6Pgz1RVgHd1NT3BlbkFJMii0qvUON1IlRxyPyGxA',
     dangerouslyAllowBrowser: true,
   })
 
-  // Load movies from local storage when component mounts
+  const API_KEY = '7a644baa';
+
   useEffect(() => {
     const storedMovies = JSON.parse(localStorage.getItem('movies'));
     if (storedMovies) {
@@ -18,13 +19,11 @@ const useMovieManager = () => {
   }, []);
 
   const addMovie = async (movieId) => {
-    await console.log(movieId);
-    const movieData = await fetchMovieData(movieId);
+    const movieData = await fetchMovieDataById(movieId);
 
     const movie = {
       id: movieId,
-      //imageUrl: imageUrl,
-      ...movieData
+      name: movieData.Title,
     };
 
     const updatedMovies = [...movies, movie];
@@ -39,30 +38,45 @@ const useMovieManager = () => {
     setMovies([]);
   };
 
-  const fetchMovieData = async (movieId) => {
-    const API_KEY = '7a644baa';
+  const fetchMovieDataById = async (movieId) => {
     try {
       const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${movieId}`);
-      const jsonData = await response.json();
-      return jsonData;
+      return await response.json();
     } catch (error) {
       console.error('Error fetching data:', error);
       return null;
     }
-    //return { rating: 'PG-13', year: 2023 };
   };
 
-  const merge = async (content) => {
+  const fetchMovieId = async (name) => {
+    try {
+      const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&t=${name}`);
+      const body = await response.json()
+      return body.imdbID;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return null;
+    }
+  };
+
+  const merge = async (movieId1, movieId2) => {
+    const [movieData1, movieData2] = await Promise.all([
+      fetchMovieDataById(movieId1),
+      fetchMovieDataById(movieId2)
+    ]);
+
+    const content = `Movie A: ${JSON.stringify(movieData1)}. Movie B: ${JSON.stringify(movieData2)}`;
+
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         {
           "role": "system", "content": "You are a function that ingests information about two different" +
-              " movies, \"Movie A\" & \"Movie B\" and returns a third movie \"Movie C\" that is most similar /" +
+              " movies, \"Movie A\" & \"Movie B\" and returns a third movie that is most similar /" +
               " relevant to the two given movies. IMPORTANT: Return just the movie Title and nothing else in" +
-              " the format \"Movie C:<Insert Movie Title>\"."
+              " the format \"Movie Title\"."
         },
-        {"role": "user", "content": content}
+        {"role": "user", "content": content},
       ],
       stream: true,
     });
@@ -70,14 +84,13 @@ const useMovieManager = () => {
     let movieTitles = [];
 
     for await (const chunk of completion) {
-      console.log(chunk.choices[0].delta.content);
       movieTitles.push(chunk.choices[0].delta.content);
     }
 
-    return movieTitles;
+    return await fetchMovieId(movieTitles.join(''));
   };
 
-  return { movies, addMovie, clearMovies, fetchMovieData, merge};
+  return { movies, addMovie, clearMovies, fetchMovieDataById, merge};
 };
 
 export default useMovieManager;

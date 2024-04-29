@@ -72,7 +72,9 @@ const MovieButton = ({ movieId }) => {
     };
 
     const limitText = (text, maxLength) => {
-        if (text.length <= maxLength) {
+        if (text == null) {
+            return "";
+        } else if (text.length <= maxLength) {
             return text;
         } else {
             return text.substring(0, maxLength) + '...';

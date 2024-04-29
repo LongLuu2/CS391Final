@@ -29,7 +29,6 @@ function Header() {
     return (
         <HeaderWrapper>
             <LeftImage src = "/logo.png" alt = "popcorn"/>
-            <StyledH1>Movie Craft</StyledH1>
             <RightImage src = "/movie.png" alt = "movie"/>
         </HeaderWrapper>
     )
