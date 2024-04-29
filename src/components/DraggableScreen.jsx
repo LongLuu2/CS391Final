@@ -3,21 +3,24 @@ import styled from "styled-components"
 import {NavLink} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import MovieButton from "./MovieButton.jsx";
+import AddMovieButton from "./AddMovieButton.jsx";
 import {useState, useRef, useEffect } from "react";
 import useMovieManager from "../hooks/useMovieManager.jsx";
 
 const SideBar = styled.div`
     height: 100%;
     width: 25%;
-    border-left: 1px solid #9f9f9f;
+    min-width: 350px;
+    overflow-x: hidden;
     overflow-y: auto;
-    margin: 0;
-    padding: 0;
+    border-left: 1px solid #9f9f9f;
     @media screen and (max-width: 900px) {
         height: 25%;
+        min-height: 200px;
         width: 100%;
-        border-top: 1px solid #9f9f9f;
         overflow-x: auto;
+        overflow-y: hidden;
+        border-top: 1px solid #9f9f9f;
     }
 `;
 
@@ -27,7 +30,7 @@ const CraftedButtons = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  border-left: 1px solid #9f9f9f;
+  padding: 8px;
 
   div {
     margin-right: 10px;
@@ -36,84 +39,71 @@ const CraftedButtons = styled.div`
   
   @media screen and (max-width: 900px) {
     height: 100%;
-    flex-direction: column;
     width: wrap-content;
-    border-top: 1px solid #9f9f9f;
+    flex-direction: column;
   }
 `
-
-const Instructions = styled.h2`
-    height: 100px;
-    width: 200px;
-    border: 1px solid #9f9f9f;
-`
+const MovieButtonWrapper = styled.div`
+  position: absolute;
+  left: ${props => props.clientX};
+  top: ${props => props.clientY};
+  z-index: 1;
+`;
 
 export const StyledButton = styled.button`
     margin: 10px;
 `;
 
-const StyledNavLink = styled.a`
-    transition: all 0.5s;
-    cursor: pointer;
-    position: relative;
-
-    &:after {
-        content: '»';
-        position: absolute;
-        opacity: 0;
-        right: -25px;
-        transition: 0.5s;
-    }
-
-    &:hover {
-        padding-right: 25px;
-
-        &:after {
-            opacity: 1;
-            right: 10px;
-        }
-    }
+const StyledForm = styled.form`
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  height: wrap-content;
 `;
 
-const handleClick = (e) => {
-    if (e.type === 'click') {
-        console.log('Left click');
-    } else if (e.type === 'contextmenu') {
-        console.log('Right click');
-    }
-};
+const StyledInput = styled.input`
+  width: 100%;
+  font-size: 16px;
+  padding: 10px;
+`;
+
 
 export default function DraggableScreen() {
     const { movies, addMovie, clearMovies} = useMovieManager();
     // Hold the buttons and their references to use their positions later on.
     const [buttons, setButtons] = useState([]);
+    const [numAddButtons, setNumAddButtons] = useState(4);
+
+    const [query, setQuery] = useState("");
+
     const buttonRefs = useRef({});
 
     const addDraggableButton = ({ clientX, clientY }, movieId) => {
         // Generate unique key for each button
         const key = uuidv4();
 
+        //Hard-coded centering around a point, because Draggable overwrites transform.
+        //When I wrapped it in a div, it would cover the other buttons without dragging.
         const newButton = (
-            <div
+            <Draggable
                 key={key}
-                style={{
-                    position: 'absolute',
-                    left: clientX,
-                    top: clientY,
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 1000,
-                }}
-                onContextMenu={(e) => handleDelete(e, key)}
+                onStop={(e, data) => handleStop(e, data, key)}
             >
-                <Draggable
-                    onStop={(e, data) => handleStop(e, data, key) }
+                <MovieButtonWrapper
+                    clientX={clientX}
+                    clientY={clientY}
+                    style={{
+                        position: 'absolute',
+                        left: clientX - 75,
+                        top: clientY - 35,
+                        zIndex: 1,
+                    }}
+                    ref={ref => buttonRefs.current[key] = ref}
+                    onContextMenu={(e) => handleDelete(e, key)}
                 >
-                    <div ref={ref => buttonRefs.current[key] = ref}>
-                        <MovieButton movieId={movieId}/>
-                    </div>
-
-                </Draggable>
-            </div>
+                    <MovieButton movieId={movieId}  onContextMenu={(e) => handleDelete(e, key)}/>
+                </MovieButtonWrapper>
+            </Draggable>
         );
 
         setButtons(prevButtons => [...prevButtons, newButton]);
@@ -168,8 +158,7 @@ export default function DraggableScreen() {
         buttonRefs.current = newButtonRefs;
     }, [buttons]);
 
-    const [buttonText, setButtonText] = useState("Random Movie");
-    const handleClick = async() => {
+    const randomMovie = async() => {
         const movieIds = ['tt0110912', 'tt1160419', 'tt3783958'];
         const randomMovieId = movieIds[Math.floor(Math.random() * movieIds.length)];
         await addMovie(randomMovieId);
@@ -186,13 +175,22 @@ export default function DraggableScreen() {
                         <MovieButton movieId={movie.id} />
                     </div>
                 ))}
+
+                {[...Array(numAddButtons)].map((_, index) => (
+                    <AddMovieButton key={index} onClick={randomMovie}/>
+                ))}
+
+                <StyledButton onClick={handleClicky}>
+                    NukeMovies
+                </StyledButton>
             </CraftedButtons>
-            <StyledButton onClick={handleClick}>
-                {buttonText}
-            </StyledButton>
-            <StyledButton onClick={handleClicky}>
-                NukeMovies
-            </StyledButton>
+
+            <StyledForm>
+                <label>
+                    <StyledInput type="text" name="name" placeholder="Search Items" />
+                </label>
+            </StyledForm>
+
             {buttons.map(button => button)}
         </SideBar>
     );

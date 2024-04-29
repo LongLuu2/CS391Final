@@ -3,11 +3,11 @@ import styled from 'styled-components';
 const StyledDiv = styled.div`
     display: flex;
     flex-direction: row;
-    height: auto;
+    height: 100%;
     width: 100%;
     padding: 10px;
     justify-content: center;
-    margin-bottom: 8%;
+    overflow-y: auto;
 `;
 
 const StyledCard = styled.div`

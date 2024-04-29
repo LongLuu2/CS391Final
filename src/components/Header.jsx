@@ -2,35 +2,35 @@ import styled from 'styled-components';
 
 const HeaderWrapper = styled.div`
     display: flex;
-    background-color: #ADD8E6;
     color: white;
-    padding: 20px;
+    padding: 10px;
     text-align: center;
     align-items: center;
     justify-content: space-between;
 `;
 
 const LeftImage = styled.img`
-    width: 50px;
+    width: 200px;
     height: auto;
+    pointer-events: none;
 `;
 
 const RightImage = styled.img`
     width: 50px;
     height: auto;
+    pointer-events: none;
 `;
 
 const StyledH1 = styled.h1`
 justify-self: center;
 `
 
-
 function Header() {
     return (
         <HeaderWrapper>
-            <LeftImage src = "/popcorn.png" alt = "popcorn"/>
+            <LeftImage src = "/logo.png" alt = "popcorn"/>
             <StyledH1>Movie Craft</StyledH1>
-            <RightImage src = "/Movie.png" alt = "movie"/>
+            <RightImage src = "/movie.png" alt = "movie"/>
         </HeaderWrapper>
     )
 }
