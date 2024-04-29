@@ -4,20 +4,21 @@ import {NavLink} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import MovieButton from "./MovieButton.jsx";
 import {useState, useRef, useEffect } from "react";
+import useMovieManager from "../hooks/useMovieManager.jsx";
 
 const SideBar = styled.div`
-  height: 100%;
-  width: 25%;
-  border-left: 1px solid #9f9f9f;
-  overflow-y: auto;
-  margin: 0;
-  padding: 0;
-  @media screen and (max-width: 900px) {
-    height: 25%;
-    width: 100%;
-    border-top: 1px solid #9f9f9f;
-    overflow-x: auto;
-  }
+    height: 100%;
+    width: 25%;
+    border-left: 1px solid #9f9f9f;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    @media screen and (max-width: 900px) {
+        height: 25%;
+        width: 100%;
+        border-top: 1px solid #9f9f9f;
+        overflow-x: auto;
+    }
 `;
 
 const CraftedButtons = styled.div`
@@ -39,35 +40,39 @@ const CraftedButtons = styled.div`
     width: wrap-content;
     border-top: 1px solid #9f9f9f;
   }
-`;
-
-const Instructions = styled.h2`
-  height: 100px;
-  width: 200px;
-  border: 1px solid #9f9f9f;
 `
 
+const Instructions = styled.h2`
+    height: 100px;
+    width: 200px;
+    border: 1px solid #9f9f9f;
+`
+
+export const StyledButton = styled.button`
+    margin: 10px;
+`;
+
 const StyledNavLink = styled.a`
-  transition: all 0.5s;
-  cursor: pointer;
-  position: relative;
-
-  &:after {
-    content: '»';
-    position: absolute;
-    opacity: 0;
-    right: -25px;
-    transition: 0.5s;
-  }
-
-  &:hover {
-    padding-right: 25px;
+    transition: all 0.5s;
+    cursor: pointer;
+    position: relative;
 
     &:after {
-      opacity: 1;
-      right: 10px;
+        content: '»';
+        position: absolute;
+        opacity: 0;
+        right: -25px;
+        transition: 0.5s;
     }
-  }
+
+    &:hover {
+        padding-right: 25px;
+
+        &:after {
+            opacity: 1;
+            right: 10px;
+        }
+    }
 `;
 
 const handleClick = (e) => {
@@ -79,11 +84,12 @@ const handleClick = (e) => {
 };
 
 export default function DraggableScreen() {
+    const { movies, addMovie, clearMovies} = useMovieManager();
     // Hold the buttons and their references to use their positions later on.
     const [buttons, setButtons] = useState([]);
     const buttonRefs = useRef({});
 
-    const addDraggableButton = ({ clientX, clientY }) => {
+    const addDraggableButton = ({ clientX, clientY }, movieId) => {
         // Generate unique key for each button
         const key = uuidv4();
 
@@ -103,7 +109,7 @@ export default function DraggableScreen() {
                     onStop={(e, data) => handleStop(e, data, key) }
                 >
                     <div ref={ref => buttonRefs.current[key] = ref}>
-                        <MovieButton/>
+                        <MovieButton movieId={movieId}/>
                     </div>
 
                 </Draggable>
@@ -162,15 +168,31 @@ export default function DraggableScreen() {
         buttonRefs.current = newButtonRefs;
     }, [buttons]);
 
+    const [buttonText, setButtonText] = useState("Random Movie");
+    const handleClick = async() => {
+        const movieIds = ['tt0110912', 'tt1160419', 'tt3783958'];
+        const randomMovieId = movieIds[Math.floor(Math.random() * movieIds.length)];
+        await addMovie(randomMovieId);
+    };
+    const handleClicky = () => {
+        clearMovies();
+    };
+
     return (
         <SideBar>
             <CraftedButtons>
-                {[...Array(5)].map((_, index) => (
-                    <div key={index} onClick={e => addDraggableButton(e)}>
-                        <MovieButton/>
+                {movies.map((movie, index) => (
+                    <div key={index} onClick={(e) => addDraggableButton(e, movie.id)}>
+                        <MovieButton movieId={movie.id} />
                     </div>
                 ))}
             </CraftedButtons>
+            <StyledButton onClick={handleClick}>
+                {buttonText}
+            </StyledButton>
+            <StyledButton onClick={handleClicky}>
+                NukeMovies
+            </StyledButton>
             {buttons.map(button => button)}
         </SideBar>
     );

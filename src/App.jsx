@@ -1,15 +1,14 @@
 import {createBrowserRouter, Route, RouterProvider, Routes} from "react-router-dom";
-import Header from "./components/Header";
 import GameScreen from "./pages/GameScreen"
-import styled, { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 import Movies from "./pages/Movies";
 
 
 const GlobalStyle = createGlobalStyle`
-  * {
-    margin: 0;
-    box-sizing: border-box;
-  }
+    * {
+        margin: 0;
+        box-sizing: border-box;
+    }
 `;
 function Root() {
   return(
@@ -25,14 +24,14 @@ function Root() {
 }
 
 const router = createBrowserRouter([
-  {path:'*', Component: Root}
+    {path:'*', Component: Root}
 ])
 
 function App() {
 
-  return (
-    <RouterProvider router ={router}/>
-  )
+    return (
+        <RouterProvider router ={router}/>
+    )
 }
 
 export default App

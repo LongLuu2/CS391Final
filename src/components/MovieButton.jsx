@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BubbleNav from './BubbleNav';
+import PropTypes from "prop-types";
 
 const Button = styled.button`
     display: flex;
+    flex-direction: row;
     background: linear-gradient(to bottom, #ffffff, #f0f0f0);
     border: 2px solid grey;
     align-items: center;
@@ -18,29 +20,26 @@ const Button = styled.button`
     }
 `;
 
-const ButtonImg = styled.img` 
+const ButtonImg = styled.img`
     width: 30px;
     height: auto;
-    pointer-events: none;
     margin-right: 10px;
+    align-self: center;
+    pointer-events: none;
 `
 
 const ButtonText = styled.p`
-    flex: 1;    
+    flex: 1;
     overflow: hidden;
+    align-self: center;
+    text-align: left;
     pointer-events: none;
 `
-const Column = styled.div`
-`
-const Row = styled.div`
-    display: flex;
-    flex-direction: row;
-`
 
-const MovieButton = () => {
+const MovieButton = ({ movieId }) => {
     const [movieData, setMovieData] = useState(null);
     const API_KEY = '7a644baa';
-    const MOVIE_ID = 'nemo';
+    //const MOVIE_ID = 'nemo';
 
     //for NavBubble visiblity
     const [isVisible, setIsVisible] = useState(false);
@@ -51,7 +50,7 @@ const MovieButton = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&t=${MOVIE_ID}`);
+                const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${movieId}`);
                 const jsonData = await response.json();
                 setMovieData(jsonData);
             } catch (error) {
@@ -60,7 +59,7 @@ const MovieButton = () => {
         };
 
         fetchData();
-    }, []);
+    }, [movieId]);
 
     const handleButtonClick = (e) => {
         console.log("Button clicked!");
@@ -82,20 +81,25 @@ const MovieButton = () => {
 ///
     return (
         <>
-        <Button onClick={handleButtonClick} onDoubleClick={handleDoubleClick}>
-            {movieData ? (
-                    <Row>
+            <Button onClick={handleButtonClick} onDoubleClick={handleDoubleClick}>
+                {movieData ? (
+                    <>
                         <ButtonImg src={movieData.Poster} alt="Poster"/>
                         <ButtonText>{limitText(movieData.Title, 40)}</ButtonText>
-                    </Row>
-            ) : (
-                <div>Loading...</div>
-            )}
-        </Button> 
-        {isVisible && <BubbleNav movieTitle={movieData ? movieData.Title : ''}/>}
+                    </>
+                ) : (
+                    <div>Loading...</div>
+                )}
+            </Button>
+            {isVisible && <BubbleNav movieTitle={movieData ? movieData.Title : ''}/>}
         </>
 
-);
+    );
+};
+
+MovieButton.propTypes = {
+    movieId: PropTypes.string.isRequired
 };
 
 export default MovieButton;
+
