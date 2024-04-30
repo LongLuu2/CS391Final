@@ -20,7 +20,7 @@ const RightImage = styled.img`
     height: auto;
     pointer-events: none;
 `;
-
+//basic header with images on both sides
 function Header() {
     return (
         <HeaderWrapper>
