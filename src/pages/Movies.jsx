@@ -15,6 +15,11 @@ const StyledH5 = styled.h5`
     text-align: center;
 `;
 
+{/*
+* Fetches the movie title after the corresponding button is clicked
+* and presents more movie's details.
+*/}
+
 export default function Movies() {
     let navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -25,6 +30,7 @@ export default function Movies() {
     const searchParams = new URLSearchParams(location.search);
     const title = searchParams.get("movieName");
 
+    //use useEffect to fetch more details about the movie
     useEffect(() => {
         async function fetchData() {
             const data = await fetch(`https://www.omdbapi.com/?apikey=e906836d&t=${title}`);
