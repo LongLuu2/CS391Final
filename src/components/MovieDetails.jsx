@@ -46,6 +46,9 @@ const StyledPlot = styled.p`
     text-align: left;
 `;
 
+{/*
+* Given the input movie, this function presents its poster and more details.
+*/}
 export default function MovieDetails({movie}) {
     return (
         <>
