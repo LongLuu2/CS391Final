@@ -17,7 +17,7 @@ const useMovieManager = () => {
 
   // openAI & omdbi API Keys
   const openai = new OpenAI({
-    apiKey: "sk-proj-nsPsrIi9zl4tS6RqXxKyT3BlbkFJugUt3OZLFikAFlwRFHm3",
+    apiKey: "<API-KEY>",
     dangerouslyAllowBrowser: true,
   })
   const API_KEY = '7a644baa';
