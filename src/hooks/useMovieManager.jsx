@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {useMovieContext} from "../context/MoviesContext.jsx";
+import {useContext, useEffect, useState} from 'react';
+import {MovieContext} from "../context/MoviesContext.jsx";
 import OpenAI from "openai";
 
 {/*
@@ -11,13 +11,13 @@ import OpenAI from "openai";
 */}
 
 const useMovieManager = () => {
-  const { movies, setMovies } = useMovieContext();
+  const { movies, setMovies } = useContext(MovieContext);
   const [numAddMovies, setNumAddMovies] = useState(4);
 
 
   // openAI & omdbi API Keys
   const openai = new OpenAI({
-    apiKey: "<API-KEY>",
+    apiKey: "",
     dangerouslyAllowBrowser: true,
   })
   const API_KEY = '7a644baa';
@@ -41,6 +41,7 @@ const useMovieManager = () => {
   *   const movie structure specifies a given movies "id" & "title"
   */}
   const addMovie = async (movieId) => {
+
     const movieData = await fetchMovieDataById(movieId);
 
     const movie = {
