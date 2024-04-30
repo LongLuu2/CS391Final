@@ -14,12 +14,13 @@ const useMovieManager = () => {
   const { movies, setMovies } = useMovieContext();
   const [numAddMovies, setNumAddMovies] = useState(4);
 
+
   // openAI & omdbi API Keys
   const openai = new OpenAI({
-    apiKey: "<API-KEY>",
+    apiKey: "sk-proj-nsPsrIi9zl4tS6RqXxKyT3BlbkFJugUt3OZLFikAFlwRFHm3",
     dangerouslyAllowBrowser: true,
   })
-  const API_KEY = '<API-KEY>';
+  const API_KEY = '7a644baa';
 
   useEffect(() => {
     const storedMovies = JSON.parse(localStorage.getItem('movies'));

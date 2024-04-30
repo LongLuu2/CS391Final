@@ -7,6 +7,12 @@ import SearchBar from './SearchBar.jsx';
 import useMovieManager from "../hooks/useMovieManager.jsx";
 import {useState, useRef, useEffect } from "react";
 
+/*
+   Draggable Screen manages a sidebar interface containing draggable buttons for movies.
+   It deals with the logic for buttons overlapping through buttons references. The component
+   also has a search function that to display relevant buttons.
+*/
+
 const SideBar = styled.div`
     height: 100%;
     width: 25%;
@@ -37,7 +43,6 @@ const CraftedButtons = styled.div`
   }
   
 `
-
 const CraftedButton = styled.div`
   margin-right: 4px;
   margin-bottom: 3px;
@@ -76,7 +81,9 @@ export default function DraggableScreen() {
                                 left: clientX - 75,
                                 top: clientY - 35,
                             }}
-                            ref={ref => buttonRefs.current[key] = ref}
+                            ref={ref => {
+                                buttonRefs.current[key] = { ref, movieId };
+                            }}
                             onContextMenu={(e) => handleDelete(e, key)}
                         >
                             <MovieButton movieId={movieId}/>
@@ -96,13 +103,13 @@ export default function DraggableScreen() {
         //User has picked up the mouse, and we have to check if any buttons are overlapping
         const currentButton = buttonRefs.current[key];
 
-        const currentButtonRect = currentButton.getBoundingClientRect();
+        const currentButtonRect = currentButton.ref.getBoundingClientRect();
 
         //Only overlap the first pair of buttons found.
         let deleted = false;
         for (const k of Object.keys(buttonRefs.current)) {
             if (k !== key && !deleted) {
-                const rect = buttonRefs.current[k].getBoundingClientRect();
+                const rect = buttonRefs.current[k].ref.getBoundingClientRect();
 
                 if (
                     currentButtonRect.left < rect.right &&
@@ -111,7 +118,7 @@ export default function DraggableScreen() {
                     currentButtonRect.bottom > rect.top
                 ) {
                     //Overlap found. Delete the buttons and add a new one.
-                    await overlap(e, k, key, movieId)
+                    await overlap(e, k, key, movieId, buttonRefs.current[k].movieId)
                     deleted = true;
                 }
             }
@@ -130,17 +137,12 @@ export default function DraggableScreen() {
         });
     };
 
-    const overlap = async (e, k, key, movieId) => {
-        const movieId1 = movieId;
-        const movieId2 = await buttons[k].movieId;
-
+    const overlap = async (e, k, key, movieId1, movieId2) => {
         const newMovieId = await merge(movieId1, movieId2)
-        console.log("new movie id", newMovieId)
 
         const movieExists = movies.some(movie => movie.id === newMovieId);
 
         if (!movieExists) {
-            console.log("true")
             const audio = new Audio('/new-movie.mp3');
             await audio.play();
             await addMovie(newMovieId);

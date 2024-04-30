@@ -21,10 +21,6 @@ const RightImage = styled.img`
     pointer-events: none;
 `;
 
-const StyledH1 = styled.h1`
-justify-self: center;
-`
-
 function Header() {
     return (
         <HeaderWrapper>

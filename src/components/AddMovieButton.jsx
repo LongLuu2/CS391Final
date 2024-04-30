@@ -1,5 +1,7 @@
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
+// A button component for adding new movies to sidebar.
 const AddButton = styled.div`
   border: 2px dashed gray;
   background: white;
@@ -14,6 +16,8 @@ const AddButton = styled.div`
   align-items: center;
   touch-action: manipulation;
   transition: box-shadow 0.2s, transform 0.1s;
+  margin-right: 4px;
+  margin-bottom: 3px;
 
   &:active {
     border-color: gray;
@@ -22,9 +26,9 @@ const AddButton = styled.div`
 `;
 
 export default function AddMovieButton({onClick}) {
-    const handleButtonClick = (e) => {
+    const handleButtonClick = async (e) => {
         const audio = new Audio('/on-click.mp3');
-        audio.play();
+        await audio.play();
         onClick(e);
     };
 
@@ -33,5 +37,8 @@ export default function AddMovieButton({onClick}) {
             +
             </AddButton>
     );
-};
+}
 
+AddMovieButton.propTypes = {
+    onClick: PropTypes.func.isRequired,
+};

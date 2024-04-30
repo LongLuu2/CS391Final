@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 const StyledForm = styled.form`
   width: 100%;
@@ -42,3 +43,9 @@ const SearchBar = ({ searchTerm, handleFormChange, onSubmit }) => {
 };
 
 export default SearchBar;
+
+SearchBar.propTypes = {
+    searchTerm: PropTypes.string.isRequired,
+    handleFormChange: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+};

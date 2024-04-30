@@ -71,12 +71,15 @@ const MovieButton = ({ movieId }) => {
     if (error) return <div><p>Failed to Load</p></div>;
     if (!data) return <div><p>Please Be Patient -- Loading...</p></div>;
 
-   //play audio when clicked
-    const audio = new Audio('/on-click.mp3');
-    audio.play();
-
     const handleDoubleClick = () => {
         toggle();
+    };
+
+    //play audio when clicked
+    const handleButtonClick = async () => {
+        console.log("Button clicked!");
+        const audio = new Audio('/on-click.mp3');
+        await audio.play();
     };
     
     const { Title, Poster } = data;
