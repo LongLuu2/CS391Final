@@ -54,7 +54,6 @@ const Row = styled.div`
 const MovieButton = ({ movieId }) => {
     
     const API_KEY = '7a644baa';
-    //const MOVIE_ID = 'nemo';
 
     
     //for NavBubble visiblity
@@ -62,37 +61,37 @@ const MovieButton = ({ movieId }) => {
     const toggle = () => {
         setIsVisible(!isVisible);
     };
-
+    //use SWR to make the api call
     const {data, error} =
         useSWR(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${movieId}`,
             (url) =>
                 fetch(url).then((res) => res.json())
         );
-    
+    //error handling
     if (error) return <div><p>Failed to Load</p></div>;
     if (!data) return <div><p>Please Be Patient -- Loading...</p></div>;
 
-    const handleButtonClick = () => {
-        console.log("Button clicked!");
-        const audio = new Audio('/on-click.mp3');
-        audio.play();
-    };
+   //play audio when clicked
+    const audio = new Audio('/on-click.mp3');
+    audio.play();
 
     const handleDoubleClick = () => {
         toggle();
     };
     
     const { Title, Poster } = data;
+    //function to limit the number of chatacters being displayed
     const limitText = (text, maxLength) => {
         if (text == null) {
             return "";
         } else if (text.length <= maxLength) {
             return text;
         } else {
+            //when it reach the maxlength, it will replace the rest with ...
             return text.substring(0, maxLength) + '...';
         }
     };
-///
+//limit movie title to 25 characters
     return (
         <>
             <Button onClick={handleButtonClick} onDoubleClick={handleDoubleClick}>
