@@ -24,7 +24,10 @@ const StyledP = styled.p `
 const StyledNavLink = styled(NavLink)`
     text-decoration: none;
 `;
-
+{/*
+takes in a title given by MovieButton and
+navigate to MovieDetails with the title
+*/}
 
 const BubbleNav = ({ movieTitle }) => {
     return (
