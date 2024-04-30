@@ -24,7 +24,7 @@ const RightImage = styled.img`
 function Header() {
     return (
         <HeaderWrapper>
-            <LeftImage src = "/logo.png" alt = "popcorn"/>
+            <LeftImage src = "/logo.png" alt = "logo"/>
             <RightImage src = "/movie.png" alt = "movie"/>
         </HeaderWrapper>
     )
