@@ -7,7 +7,7 @@ const useMovieManager = () => {
   const [numAddMovies, setNumAddMovies] = useState(4);
 
   const openai = new OpenAI({
-    apiKey: "",
+    apiKey: "<API-KEY>",
     dangerouslyAllowBrowser: true,
   })
 
@@ -69,6 +69,9 @@ const useMovieManager = () => {
     try {
       const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&t=${name}`);
       const body = await response.json();
+      if (body.Response === "False") {
+        return null;
+      }
       return body.imdbID;
     } catch (error) {
       return null;
@@ -83,27 +86,40 @@ const useMovieManager = () => {
 
     const content = `Movie A: ${JSON.stringify(movieData1)}. Movie B: ${JSON.stringify(movieData2)}`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          "role": "system", "content": "You are a function that ingests information about two different" +
-              " movies, \"Movie A\" & \"Movie B\" and returns a third movie that is most similar /" +
-              " relevant to the two given movies. IMPORTANT: Return just the movie Title and nothing else in" +
-              " the format \"Movie Title\"."
-        },
-        {"role": "user", "content": content},
-      ],
-      stream: true,
-    });
+    let attempts = 0;
 
-    let movieTitles = [];
+    while (attempts < 3) {
+      let movieTitles = [];
 
-    for await (const chunk of completion) {
-      movieTitles.push(chunk.choices[0].delta.content);
+      const completion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            "role": "system", "content": "You are a function that ingests information about two different" +
+                " movies, \"Movie A\" & \"Movie B\" and returns a third movie that is most similar /" +
+                " relevant to the two given movies. IMPORTANT: Return just the movie Title and nothing else in" +
+                " the format \"Movie Title\"."
+          },
+          {"role": "user", "content": content},
+        ],
+        stream: true,
+      });
+
+      for await (const chunk of completion) {
+        movieTitles.push(chunk.choices[0].delta.content);
+      }
+
+      let movieC = await(fetchMovieId(movieTitles.join('')));
+
+      if (movieC === null) {
+        console.log(`WAHHHH ${movieTitles}`);
+        attempts++;
+      } else {
+        return movieC;
+      }
     }
 
-    return await fetchMovieId(movieTitles.join(''));
+    return movieId1;
   };
 
   return { movies, numAddMovies, addMovie, clearMovies, fetchMovieDataById, merge, fetchMovieId, decrementAddMovie };
