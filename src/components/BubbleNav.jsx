@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { NavLink } from 'react-router-dom';
 
-const Styledbubble = styled.div`
+const StyledBubble = styled.div`
     position: absolute;
     left: 18%; 
     padding: 5px;
@@ -29,11 +29,11 @@ const StyledNavLink = styled(NavLink)`
 const BubbleNav = ({ movieTitle }) => {
     return (
         <div> 
-            <Styledbubble>
+            <StyledBubble>
                 <StyledNavLink to={{ pathname: '/Movies', search: `?movieName=${movieTitle}`}}>
                     <StyledP>more details</StyledP>
                 </StyledNavLink>
-            </Styledbubble>
+            </StyledBubble>
         </div>
     );
 }

@@ -30,11 +30,6 @@ const CraftedButtons = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   padding: 8px;
-
-  div {
-    margin-right: 4px;
-    margin-bottom: 3px;
-  }
   
   @media screen and (max-width: 900px) {
     height: 100%;
@@ -42,6 +37,11 @@ const CraftedButtons = styled.div`
   }
   
 `
+
+const CraftedButton = styled.div`
+  margin-right: 4px;
+  margin-bottom: 3px;
+`;
 
 const MovieButtonWrapper = styled.div`
   position: absolute;
@@ -205,9 +205,9 @@ export default function DraggableScreen() {
                     .filter(movie => movie.name.toLowerCase().includes(searchTerm.toLowerCase()))
                     .map((movie, index) => (
                         typeof movie.id === 'string' && (
-                            <div key={index} onClick={(e) => addDraggableButton(e, movie.id)}>
+                            <CraftedButton key={index} onClick={(e) => addDraggableButton(e, movie.id)}>
                                 <MovieButton movieId={movie.id} />
-                            </div>
+                            </CraftedButton>
                         )
                     ))}
 

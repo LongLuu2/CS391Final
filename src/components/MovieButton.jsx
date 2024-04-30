@@ -26,7 +26,6 @@ const ButtonImg = styled.img`
     height: 40px;
     overflow: hidden;
     border-radius: 50%;
-    margin-right: 10px;
     align-self: center;
     pointer-events: none;
 `
@@ -39,17 +38,12 @@ const ButtonText = styled.p`
     pointer-events: none;
 `
 const ImageColumn = styled.div`
-    flex: 50%;
     padding-right: 10px;
-    margin-left: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
-    
 `;
 const TextColumn = styled.div`
-    flex: 50%;
-    padding-top: 2px;
     display: flex;
     justify-content: center;
     text-align: center;
@@ -107,8 +101,8 @@ const MovieButton = ({ movieId }) => {
                         <ButtonImg src={Poster} alt="Poster"/>
                     </ImageColumn>
                     <TextColumn>
-                     <ButtonText>{limitText(Title, 20)}</ButtonText>
-                 </TextColumn>
+                        <ButtonText>{limitText(Title, 25)}</ButtonText>
+                    </TextColumn>
                 </Row>
             </Button>
             {isVisible && <BubbleNav movieTitle={Title}/>}
