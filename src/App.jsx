@@ -11,6 +11,10 @@ const GlobalStyle = createGlobalStyle`
         box-sizing: border-box;
     }
 `;
+{/*
+Using BrowserRouter for navigation
+Maps NavLink paths to respective pages
+*/}
 function Root() {
   return(
     <>
