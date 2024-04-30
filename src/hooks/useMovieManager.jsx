@@ -2,16 +2,24 @@ import {useEffect, useState} from 'react';
 import {useMovieContext} from "../context/MoviesContext.jsx";
 import OpenAI from "openai";
 
+{/*
+* useMovieManager handles:
+*   Storing, Removing and Fetching Movies to & from localStorage
+*   Fetching movieIds given movieTitle
+*   Fetching movieTitle given movieId
+*   Merging of two movies by openAI chat completion
+*/}
+
 const useMovieManager = () => {
   const { movies, setMovies } = useMovieContext();
   const [numAddMovies, setNumAddMovies] = useState(4);
 
+  // openAI & omdbi API Keys
   const openai = new OpenAI({
     apiKey: "<API-KEY>",
     dangerouslyAllowBrowser: true,
   })
-
-  const API_KEY = '7a644baa';
+  const API_KEY = '<API-KEY>';
 
   useEffect(() => {
     const storedMovies = JSON.parse(localStorage.getItem('movies'));
@@ -26,6 +34,11 @@ const useMovieManager = () => {
     }
   }, [setMovies]);
 
+  {/*
+  * addMovie
+  *   Passed in id of movie to be added to local storage by way of "movieId"
+  *   const movie structure specifies a given movies "id" & "title"
+  */}
   const addMovie = async (movieId) => {
     const movieData = await fetchMovieDataById(movieId);
 
@@ -41,12 +54,20 @@ const useMovieManager = () => {
     setMovies(updatedMovies);
   };
 
+  {/*
+  * decrementMovie
+  *   Handles number of Movies currently stored in local storage
+  */}
   const decrementAddMovie = async () => {
     const updatedNumAddMovies = numAddMovies - 1;
     localStorage.setItem('left', updatedNumAddMovies.toString());
     setNumAddMovies(updatedNumAddMovies);
   };
 
+  {/*
+  * clearMovies
+  *   Handles removing all movies from local storage
+  */}
   const clearMovies = async () => {
     localStorage.removeItem('movies');
     localStorage.removeItem('left');
@@ -54,6 +75,11 @@ const useMovieManager = () => {
     setNumAddMovies(4);
   };
 
+  {/*
+  * fetchMovieDataById
+  *   Passed in id of a movie and calls omdbapi to retrieve movie Data in form of json
+  *   (https://www.omdbapi.com/)
+  */}
   const fetchMovieDataById = async (movieId) => {
     try {
       const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${movieId}`);
@@ -64,6 +90,12 @@ const useMovieManager = () => {
     }
   };
 
+  {/*
+  * fetchMovieId
+  *   Passed in name of a movie and calls omdbapi to retrieve movie ID
+  *   If movie doesn't exist, return null
+  *   (https://www.omdbapi.com/)
+  */}
   const fetchMovieId = async (name) => {
     console.log(name);
     try {
@@ -78,6 +110,13 @@ const useMovieManager = () => {
     }
   };
 
+  {/*
+  * merge
+  *   Passed in ids of two movies & returns a third movie of similarity
+  *   openAI gpt-3.5-turbo ingests the two movies Data & returns a movie it thinks is most similar
+  *   Given 3 attempts to provide a valid movie Title that omdbi accepts; if fails, returns the first movie
+  *   (https://platform.openai.com/docs/api-reference/introduction)
+  */}
   const merge = async (movieId1, movieId2) => {
     const [movieData1, movieData2] = await Promise.all([
       fetchMovieDataById(movieId1),
