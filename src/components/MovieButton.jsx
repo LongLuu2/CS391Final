@@ -70,7 +70,8 @@ const MovieButton = ({ movieId }) => {
     //error handling
     if (error) return <div><p>Failed to Load</p></div>;
     if (!data) return <div><p>Please Be Patient -- Loading...</p></div>;
-
+    
+    //toggles BubbleNav visiblity on double click
     const handleDoubleClick = () => {
         toggle();
     };
